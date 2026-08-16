@@ -34,6 +34,15 @@
                 if (text) text.textContent = settings.support_email;
             }
         });
+        var address = document.querySelector("footer .footer-content-list li:nth-child(2) h5");
+        if (address && settings.contact_address) address.textContent = settings.contact_address;
+        if (settings.support_phone) {
+            document.querySelectorAll("body *").forEach(function (element) {
+                if (element.children.length === 0 && /\+1 917 376 8944|\(603\) 555-0123/.test(element.textContent)) {
+                    element.textContent = settings.support_phone;
+                }
+            });
+        }
 
         var newsletterTitle = document.querySelector(".newsletter-section .newsletter-content h3");
         var newsletterDescription = document.querySelector(".newsletter-section .newsletter-content h4");

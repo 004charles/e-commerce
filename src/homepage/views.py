@@ -46,7 +46,7 @@ def home_data(request):
         status=Product.Status.ACTIVE,
         stock__gt=0,
         store__status=Store.Status.APPROVED,
-    ).select_related("store", "category")[:24]
+    ).select_related("store", "category")[:100]
     payload = {
         "products": [
             {
@@ -83,6 +83,15 @@ def home_data(request):
         "stores": [
             {"name": store.name, "url": request.build_absolute_uri(store.get_absolute_url())}
             for store in Store.objects.filter(status=Store.Status.APPROVED)[:8]
+        ],
+        "text_blocks": [
+            {
+                "key": block.key,
+                "title": block.title,
+                "subtitle": block.subtitle,
+                "body": block.body,
+            }
+            for block in HomepageTextBlock.objects.filter(is_active=True)
         ],
     }
     return JsonResponse(payload)

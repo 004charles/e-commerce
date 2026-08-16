@@ -13,36 +13,53 @@
         });
     }
 
-    function updateAllOriginalProductCards(data) {
-        if (!data.products || !data.products.length) {
-            return;
-        }
-        var slides = document.querySelectorAll(".product-box.productMain");
-        data.products.slice(0, slides.length).forEach(function (product, index) {
-            var slide = slides[index];
-            slide.setAttribute("data-product-id", product.id);
-            var cartButton = slide.querySelector(".cart-button");
-            if (cartButton) cartButton.setAttribute("data-product-id", product.id);
-            var imageLink = slide.querySelector(".product-image");
-            var image = slide.querySelector(".product-image img");
-            var nameLink = slide.querySelector(".product-content > a");
-            var name = slide.querySelector(".productName");
-            var price = slide.querySelector(".price");
-            var sold = slide.querySelector(".sold");
+    function applyProductCard(card, product) {
+        if (!card || !product) return;
+        card.setAttribute("data-product-id", product.id);
+        var links = card.querySelectorAll("a.product-image, .product-content > a, .product-content a, a.main-image-box");
+        links.forEach(function (link) { link.href = product.url; });
+        var images = card.querySelectorAll(".product-image img, a.main-image-box img, .thumbnail-image img");
+        images.forEach(function (image) {
+            if (product.image) image.src = product.image;
+            image.alt = product.name;
+        });
+        var names = card.querySelectorAll(".productName, .product-content .name, .product-content > a h3, .product-content > a h4");
+        names.forEach(function (name) { name.textContent = product.name; });
+        var prices = card.querySelectorAll(".price");
+        prices.forEach(function (price) {
+            price.innerHTML = escapeHtml(product.price) +
+                (product.compare_at_price ? " <del>" + escapeHtml(product.compare_at_price) + "</del>" : "") +
+                (product.discount_percent && Number(product.discount_percent) > 0 ? " <span class=\"badge bg-danger\">-" + escapeHtml(product.discount_percent) + "%</span>" : "");
+        });
+        var sold = card.querySelector(".sold");
+        if (sold) sold.textContent = product.store + " · Stock: " + product.stock;
+        var status = card.querySelector(".product-rating h5 span");
+        if (status) status.textContent = product.stock > 10 ? "Disponível" : "Poucas unidades";
+        var cartButton = card.querySelector(".cart-button, .cart-btn, .add-to-cart-btn");
+        if (cartButton) cartButton.setAttribute("data-product-id", product.id);
+    }
 
-            if (imageLink) imageLink.href = product.url;
-            if (image) {
-                image.src = product.image || image.src;
-                image.alt = product.name;
-            }
-            if (nameLink) nameLink.href = product.url;
-            if (name) name.textContent = product.name;
-            if (price) {
-                price.innerHTML = escapeHtml(product.price) +
-                    (product.compare_at_price ? " <del>" + escapeHtml(product.compare_at_price) + "</del>" : "") +
-                    (product.discount_percent && Number(product.discount_percent) > 0 ? " <span class=\"badge bg-danger\">-" + escapeHtml(product.discount_percent) + "%</span>" : "");
-            }
-            if (sold) sold.textContent = product.store + " · Stock: " + product.stock;
+    function updateAllOriginalProductCards(data) {
+        var products = data.products || [];
+        if (!products.length) return;
+        document.querySelectorAll(".product-box.productMain").forEach(function (card, index) {
+            applyProductCard(card, products[index % products.length]);
+        });
+    }
+
+    function updateVerticalProductCards(data) {
+        var products = data.products || [];
+        if (!products.length) return;
+        document.querySelectorAll("section .vertical-product-box").forEach(function (card, index) {
+            applyProductCard(card, products[index % products.length]);
+        });
+    }
+
+    function updateHotDealCards(data) {
+        var products = data.products || [];
+        if (!products.length) return;
+        document.querySelectorAll("section .hot-deal-product-box").forEach(function (card, index) {
+            applyProductCard(card, products[index % products.length]);
         });
     }
 
@@ -51,8 +68,7 @@
         if (!banners.length) return;
         var images = document.querySelectorAll(".banner-box img, .banner-box-9 img, .offer-product-box img, .menu-banner img");
         images.forEach(function (image, index) {
-            var banner = banners[index];
-            if (!banner) return;
+            var banner = banners[index % banners.length];
             image.src = banner.image;
             image.alt = banner.title || "Marketplace Angola";
             var link = image.closest("a");
@@ -61,10 +77,10 @@
     }
 
     function updateOriginalCategoryCards(data) {
-        if (!data.categories || !data.categories.length) return;
-        var cards = document.querySelectorAll(".category-box-slide .category-box");
-        data.categories.slice(0, cards.length).forEach(function (category, index) {
-            var card = cards[index];
+        var categories = data.categories || [];
+        if (!categories.length) return;
+        document.querySelectorAll(".category-box-slide .category-box").forEach(function (card, index) {
+            var category = categories[index % categories.length];
             card.href = category.url;
             var image = card.querySelector("img");
             var name = card.querySelector("h4");
@@ -76,15 +92,56 @@
         });
     }
 
+    function updateHotTags(data) {
+        var categories = data.categories || [];
+        if (!categories.length) return;
+        document.querySelectorAll(".hot-tag-list a").forEach(function (link, index) {
+            var category = categories[index % categories.length];
+            link.href = category.url;
+            link.textContent = category.name;
+        });
+    }
+
+    function updateSectionTexts(data) {
+        var blocks = {};
+        (data.text_blocks || []).forEach(function (block) { blocks[block.key] = block; });
+        var headingKeys = {
+            "Flash Sale": "flash-sale",
+            "Ofertas relâmpago": "flash-sale",
+            "Get it all right here": "categories",
+            "Compre por categorias": "categories",
+            "Recommendations": "recommendations",
+            "Recomendações": "recommendations",
+            "Tendências": "trending",
+            "Deal hot today": "hot-deals",
+            "Oferta do dia": "hot-deals",
+            "Hot Tag:": "hot-tags",
+            "Categorias populares": "hot-tags",
+            "Don't Miss This Offers": "offers",
+            "Não perca estas ofertas": "offers",
+        };
+        document.querySelectorAll("section").forEach(function (section) {
+            section.querySelectorAll("h2, h3").forEach(function (heading) {
+                var current = heading.textContent.trim();
+                var key = headingKeys[current];
+                var block = key ? blocks[key] : null;
+                if (block && block.title) heading.textContent = block.title;
+            });
+        });
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
-        fetch("/home/data/", {headers: {"Accept": "application/json"}})
+        fetch("/home/data/", {headers: {"Accept": "application/json"}, credentials: "same-origin"})
             .then(function (response) { return response.ok ? response.json() : null; })
             .then(function (data) {
-                if (data) {
-                    updateAllOriginalProductCards(data);
-                    updateOriginalCategoryCards(data);
-                    updateOriginalBannerImages(data);
-                }
+                if (!data) return;
+                updateAllOriginalProductCards(data);
+                updateVerticalProductCards(data);
+                updateHotDealCards(data);
+                updateOriginalCategoryCards(data);
+                updateHotTags(data);
+                updateOriginalBannerImages(data);
+                updateSectionTexts(data);
             })
             .catch(function () {
                 // O conteúdo original do tema permanece visível quando não há dados do marketplace.

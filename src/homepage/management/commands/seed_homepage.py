@@ -57,6 +57,41 @@ class Command(BaseCommand):
                 "subtitle": "Promoções e produtos em destaque",
                 "body": "Subscreva para receber as principais novidades.",
             },
+            "flash-sale": {
+                "title": "Ofertas relâmpago",
+                "subtitle": "Produtos selecionados com preços especiais.",
+                "body": "Stock limitado e oportunidades atualizadas diariamente.",
+            },
+            "categories": {
+                "title": "Compre por categorias",
+                "subtitle": "Encontre rapidamente o que procura.",
+                "body": "Explore produtos de lojas aprovadas em Angola.",
+            },
+            "recommendations": {
+                "title": "Recomendações",
+                "subtitle": "Produtos em destaque no marketplace.",
+                "body": "Compare lojas, preços e disponibilidade antes de comprar.",
+            },
+            "trending": {
+                "title": "Tendências",
+                "subtitle": "Escolhas populares entre os clientes.",
+                "body": "",
+            },
+            "hot-deals": {
+                "title": "Oferta do dia",
+                "subtitle": "Uma seleção especial das nossas lojas.",
+                "body": "",
+            },
+            "hot-tags": {
+                "title": "Categorias populares",
+                "subtitle": "Pesquise por temas e encontre novos produtos.",
+                "body": "",
+            },
+            "offers": {
+                "title": "Não perca estas ofertas",
+                "subtitle": "Promoções de lojas aprovadas em Angola.",
+                "body": "",
+            },
         }
         for key, values in text_blocks.items():
             HomepageTextBlock.objects.update_or_create(
