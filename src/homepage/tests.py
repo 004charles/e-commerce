@@ -5,6 +5,8 @@ from accounts.models import User
 from catalog.models import Category, Product
 from stores.models import Store
 
+from .models import HomepageLink, HomepageTextBlock, SiteSettings
+
 
 class MarketplaceSearchTests(TestCase):
     def setUp(self):
@@ -61,3 +63,33 @@ class MarketplaceSearchTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["count"], 1)
+
+    def test_site_data_returns_database_configured_content(self):
+        SiteSettings.objects.create(
+            key="default",
+            site_name="Marketplace Teste",
+            shipping_message="Entrega em Luanda",
+            support_phone="+244 900 000 000",
+            currency_code="AOA",
+            currency_symbol="Kz",
+        )
+        HomepageTextBlock.objects.create(
+            key="newsletter",
+            title="Novidades de teste",
+            subtitle="Receba ofertas",
+            body="Conteúdo vindo do banco.",
+        )
+        HomepageLink.objects.create(
+            placement=HomepageLink.Placement.HEADER,
+            label="Catálogo de teste",
+            url="/catalog/",
+        )
+
+        response = self.client.get(reverse("homepage:site-data"))
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["settings"]["site_name"], "Marketplace Teste")
+        self.assertEqual(payload["settings"]["shipping_message"], "Entrega em Luanda")
+        self.assertEqual(payload["text_blocks"][0]["title"], "Novidades de teste")
+        self.assertEqual(payload["links"][0]["label"], "Catálogo de teste")

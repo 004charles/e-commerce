@@ -1,6 +1,8 @@
 from decimal import Decimal, InvalidOperation
+from django.db import models
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.utils import timezone
 from django.urls import reverse
 from unicodedata import combining as unicode_combining
 from unicodedata import normalize as unicode_normalize
@@ -9,6 +11,8 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from catalog.models import Category, Product
 from catalog.pricing import price_context
 from stores.models import Store
+
+from .models import HomepageBanner, HomepageLink, HomepageTextBlock, SiteSettings
 
 
 @ensure_csrf_cookie
@@ -33,6 +37,11 @@ def home(request):
 
 
 def home_data(request):
+    now = timezone.now()
+    banners = HomepageBanner.objects.filter(is_active=True).filter(
+        models.Q(starts_at__isnull=True) | models.Q(starts_at__lte=now),
+        models.Q(ends_at__isnull=True) | models.Q(ends_at__gt=now),
+    )
     products = Product.objects.filter(
         status=Product.Status.ACTIVE,
         stock__gt=0,
@@ -53,9 +62,18 @@ def home_data(request):
             }
             for product in products
         ],
+        "banners": [
+            {
+                "title": banner.title,
+                "button_url": banner.button_url,
+                "image": request.build_absolute_uri(banner.image.url) if banner.image else "",
+            }
+            for banner in banners
+        ],
         "categories": [
             {
                 "name": category.name,
+                "image": request.build_absolute_uri(category.image.url) if category.image else "",
                 "url": request.build_absolute_uri(
                     reverse("catalog:category", kwargs={"category_slug": category.slug})
                 ),
@@ -65,6 +83,66 @@ def home_data(request):
         "stores": [
             {"name": store.name, "url": request.build_absolute_uri(store.get_absolute_url())}
             for store in Store.objects.filter(status=Store.Status.APPROVED)[:8]
+        ],
+    }
+    return JsonResponse(payload)
+
+
+def site_data(request):
+    now = timezone.now()
+    settings = SiteSettings.objects.filter(key="default").first()
+    banners = HomepageBanner.objects.filter(is_active=True).filter(
+        models.Q(starts_at__isnull=True) | models.Q(starts_at__lte=now),
+        models.Q(ends_at__isnull=True) | models.Q(ends_at__gt=now),
+    )
+    payload = {
+        "settings": {
+            "site_name": settings.site_name if settings else "Marketplace Angola",
+            "tagline": settings.tagline if settings else "",
+            "shipping_message": settings.shipping_message if settings else "",
+            "support_phone": settings.support_phone if settings else "",
+            "support_email": settings.support_email if settings else "",
+            "contact_address": settings.contact_address if settings else "",
+            "facebook_url": settings.facebook_url if settings else "",
+            "instagram_url": settings.instagram_url if settings else "",
+            "twitter_url": settings.twitter_url if settings else "",
+            "whatsapp_url": settings.whatsapp_url if settings else "",
+            "newsletter_title": settings.newsletter_title if settings else "",
+            "newsletter_description": settings.newsletter_description if settings else "",
+            "currency_code": settings.currency_code if settings else "AOA",
+            "currency_symbol": settings.currency_symbol if settings else "Kz",
+        },
+        "banners": [
+            {
+                "placement": banner.placement,
+                "title": banner.title,
+                "subtitle": banner.subtitle,
+                "description": banner.description,
+                "button_label": banner.button_label,
+                "button_url": banner.button_url,
+                "image": request.build_absolute_uri(banner.image.url) if banner.image else "",
+            }
+            for banner in banners
+        ],
+        "text_blocks": [
+            {
+                "key": block.key,
+                "title": block.title,
+                "subtitle": block.subtitle,
+                "body": block.body,
+                "button_label": block.button_label,
+                "button_url": block.button_url,
+            }
+            for block in HomepageTextBlock.objects.filter(is_active=True)
+        ],
+        "links": [
+            {
+                "placement": link.placement,
+                "label": link.label,
+                "url": link.url,
+                "icon": link.icon,
+            }
+            for link in HomepageLink.objects.filter(is_active=True)
         ],
     }
     return JsonResponse(payload)
