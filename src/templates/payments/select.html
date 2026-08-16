@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pagamento — Marketplace Angola</title>
+    <link rel="stylesheet" href="/assets/css/vendors/bootstrap.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body class="base-bg-color">
+    <main class="container py-5" style="max-width: 760px;">
+        <div class="pro-bg-white rounded-3 p-4 shadow-sm">
+            <p class="template-text-content mb-1">Marketplace Angola</p>
+            <h1 class="h3 mb-2">Escolher método de pagamento</h1>
+            <p class="text-muted">Pedido <strong>#{{ order.order_number }}</strong> · Total <strong>{{ order.total }} Kz</strong></p>
+            <div class="alert alert-warning">As integrações oficiais ainda estão a ser configuradas. Esta etapa não efetua cobranças fictícias.</div>
+            <form method="post">
+                {% csrf_token %}
+                {% for radio in form.method %}
+                    <label class="d-flex align-items-center gap-3 border rounded-3 p-3 mb-3" for="{{ radio.id_for_label }}">
+                        {{ radio.tag }}
+                        <span>{{ radio.choice_label }}</span>
+                    </label>
+                {% endfor %}
+                {% for error in form.method.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                <button class="btn btn-primary w-100 mt-2" type="submit">Continuar</button>
+            </form>
+            <a class="btn btn-link mt-3" href="{% url 'orders:success' order.order_number %}">Ver confirmação do pedido</a>
+        </div>
+    </main>
+</body>
+</html>

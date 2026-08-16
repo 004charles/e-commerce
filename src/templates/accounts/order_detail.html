@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ order.order_number }} — Marketplace Angola</title>
+    <link rel="stylesheet" href="/assets/css/vendors/bootstrap.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/marketplace-account.css?v=20260815account1">
+</head>
+<body class="account-shell">
+    <div class="account-topbar"><div class="container d-flex justify-content-between align-items-center"><span>Marketplace Angola · Compras simples e seguras</span><a href="/">Voltar à loja</a></div></div>
+    <nav class="account-navbar"><div class="container d-flex justify-content-between align-items-center gap-3"><a class="account-brand" href="/">Market<span>place</span></a><div class="d-flex align-items-center gap-3"><a class="account-nav-link" href="{% url 'accounts:order-list' %}">Os meus pedidos</a><a class="account-nav-link" href="{% url 'accounts:profile' %}">A minha conta</a></div></div></nav>
+    <main class="account-main"><div class="container">
+        <div class="d-flex justify-content-between align-items-end gap-3 mb-4"><div><div class="account-eyebrow">Histórico de compras</div><h1 class="account-title mb-2">Pedido {{ order.order_number }}</h1><p class="account-subtitle mb-0">{{ order.created_at|date:"d/m/Y H:i" }}</p></div><a href="{% url 'accounts:order-list' %}" class="account-outline-btn">Voltar aos pedidos</a></div>
+        <div class="row g-4">
+            <div class="col-lg-8">{% for store_order in order.store_orders.all %}<div class="account-card mb-4"><div class="account-card-header d-flex justify-content-between align-items-center gap-3"><div><h2 class="mb-1">{{ store_order.store.name }}</h2><span class="account-muted">{{ store_order.store.municipality }}, {{ store_order.store.province }}</span></div><span class="account-badge">{{ store_order.get_status_display }}</span></div><div class="account-card-body">{% for item in store_order.items.all %}<div class="d-flex align-items-center gap-3 border-bottom py-3">{% if item.image %}<img src="/media/{{ item.image }}" alt="{{ item.product_name }}" style="width:64px;height:64px;object-fit:cover;border-radius:7px;background:#f6f7f9;">{% endif %}<div class="flex-grow-1"><strong class="d-block">{{ item.product_name }}</strong><small class="account-muted">SKU {{ item.sku }} · {{ item.quantity }} × {{ item.unit_price }} Kz</small></div><strong>{{ item.line_total }} Kz</strong></div>{% endfor %}<div class="d-flex justify-content-between pt-3"><span class="account-muted">Subtotal da loja</span><strong>{{ store_order.total }} Kz</strong></div></div></div>{% endfor %}</div>
+            <div class="col-lg-4"><div class="account-card mb-4"><div class="account-card-header"><h2 class="mb-0">Resumo do pedido</h2></div><div class="account-card-body"><div class="d-flex justify-content-between mb-2"><span class="account-muted">Estado</span><strong>{{ order.get_status_display }}</strong></div><div class="d-flex justify-content-between mb-3"><span class="account-muted">Pagamento</span><strong>{{ order.get_payment_status_display }}</strong></div><div class="border-top pt-3 d-flex justify-content-between"><strong>Total</strong><strong>{{ order.total }} {{ order.currency }}</strong></div></div></div><div class="account-card"><div class="account-card-header"><h2 class="mb-0">Entrega</h2></div><div class="account-card-body"><strong class="d-block mb-1">{{ order.customer_name }}</strong><span class="account-muted d-block">{{ order.customer_phone }}</span><span class="account-muted d-block mt-2">{{ order.address }}</span>{% if order.address_details %}<span class="account-muted d-block">{{ order.address_details }}</span>{% endif %}<span class="account-muted d-block">{{ order.municipality }}, {{ order.province }}</span></div></div></div>
+        </div>
+    </div></main>
+    <footer class="account-footer"><div class="container d-flex justify-content-between"><span>© Marketplace Angola</span><span>Compras em AOA</span></div></footer>
+</body>
+</html>

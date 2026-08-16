@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-AO">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} | {{ store.name }}</title>
+    <link rel="stylesheet" href="/assets/css/vendors/bootstrap.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body class="base-bg-color">
+    <main class="container py-5">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <div>
+                <p class="template-text-content mb-1">Área do vendedor</p>
+                <h1 class="h3 mb-0">{{ page_title }}</h1>
+                <p class="text-muted mb-0">{{ store.name }}</p>
+            </div>
+            <a class="btn btn-outline-secondary" href="{% url 'stores:dashboard' %}">Voltar ao dashboard</a>
+        </div>
+
+        <section class="pro-bg-white rounded-3 p-4 p-md-5 shadow-sm">
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                {% endif %}
+                <div class="row g-4">
+                    <div class="col-md-8">
+                        <label class="form-label" for="{{ form.name.id_for_label }}">Nome do produto</label>
+                        {{ form.name }}
+                        {{ form.name.errors }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="{{ form.sku.id_for_label }}">SKU</label>
+                        {{ form.sku }}
+                        {{ form.sku.errors }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.category.id_for_label }}">Categoria</label>
+                        {{ form.category }}
+                        {{ form.category.errors }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.slug.id_for_label }}">Slug</label>
+                        {{ form.slug }}
+                        <small class="text-muted">Pode deixar vazio para gerar pelo nome.</small>
+                        {{ form.slug.errors }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="{{ form.short_description.id_for_label }}">Descrição curta</label>
+                        {{ form.short_description }}
+                        {{ form.short_description.errors }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="{{ form.description.id_for_label }}">Descrição completa</label>
+                        {{ form.description }}
+                        {{ form.description.errors }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.image.id_for_label }}">Imagem principal</label>
+                        {{ form.image }}
+                        {% if product.image %}<img class="img-thumbnail mt-2" style="max-height:140px" src="{{ product.image.url }}" alt="{{ product.name }}">{% endif %}
+                        {{ form.image.errors }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="{{ form.price.id_for_label }}">Preço (AOA)</label>
+                        {{ form.price }}
+                        {{ form.price.errors }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="{{ form.compare_at_price.id_for_label }}">Preço anterior (AOA)</label>
+                        {{ form.compare_at_price }}
+                        {{ form.compare_at_price.errors }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="{{ form.stock.id_for_label }}">Stock</label>
+                        {{ form.stock }}
+                        {{ form.stock.errors }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="{{ form.status.id_for_label }}">Estado</label>
+                        {{ form.status }}
+                        {{ form.status.errors }}
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end gap-3 pb-2">
+                        <div class="form-check">{{ form.featured }} <label class="form-check-label" for="{{ form.featured.id_for_label }}">Em destaque</label></div>
+                        <div class="form-check">{{ form.is_new }} <label class="form-check-label" for="{{ form.is_new.id_for_label }}">Novidade</label></div>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 mt-4">
+                    <button class="btn btn-primary" type="submit">{{ submit_label }}</button>
+                    <a class="btn btn-light" href="{% url 'stores:dashboard' %}">Cancelar</a>
+                </div>
+            </form>
+        </section>
+    </main>
+    <script src="/assets/js/marketplace-i18n.js?v=20260815i18n13"></script>
+</body>
+</html>

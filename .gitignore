@@ -1,0 +1,22 @@
+# Artefactos Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ambiente local e segredos
+.env
+.env.*
+!.env.example
+
+# Runtime Django local
+src/db.sqlite3
+src/media/
+src/staticfiles/
+*.log
+
+# Ferramentas e caches
+.vscode/
+.idea/
+.pytest_cache/
+.coverage
+.DS_Store

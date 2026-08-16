@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pagamento pendente — Marketplace Angola</title>
+    <link rel="stylesheet" href="/assets/css/vendors/bootstrap.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body class="base-bg-color">
+    <main class="container py-5" style="max-width: 760px;">
+        <div class="pro-bg-white rounded-3 p-4 shadow-sm">
+            <div class="alert alert-info">
+                <h1 class="h4">Pagamento pendente</h1>
+                <p class="mb-0">O pedido <strong>#{{ order.order_number }}</strong> foi registado, mas não foi realizada nenhuma cobrança.</p>
+            </div>
+            {% if attempt %}
+                <p><strong>Método selecionado:</strong> {{ attempt.get_method_display }}</p>
+                <p><strong>Estado:</strong> {{ attempt.get_status_display }}</p>
+                <p class="text-muted">{{ attempt.message }}</p>
+            {% else %}
+                <p class="text-muted">Ainda não foi selecionado um método de pagamento.</p>
+            {% endif %}
+            <div class="d-flex gap-2 flex-wrap mt-4">
+                <a class="btn btn-primary" href="{% url 'payments:select' order.order_number %}">Escolher outro método</a>
+                <a class="btn btn-outline-secondary" href="{% url 'orders:success' order.order_number %}">Ver pedido</a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

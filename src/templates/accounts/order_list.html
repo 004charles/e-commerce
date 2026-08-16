@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Os meus pedidos — Marketplace Angola</title>
+    <link rel="stylesheet" href="/assets/css/vendors/bootstrap.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/marketplace-account.css?v=20260815account1">
+</head>
+<body class="account-shell">
+    <div class="account-topbar"><div class="container d-flex justify-content-between align-items-center"><span>Marketplace Angola · Compras simples e seguras</span><a href="/">Voltar à loja</a></div></div>
+    <nav class="account-navbar"><div class="container d-flex justify-content-between align-items-center gap-3"><a class="account-brand" href="/">Market<span>place</span></a><div class="d-flex align-items-center gap-3"><a class="account-nav-link" href="{% url 'accounts:profile' %}">A minha conta</a><a class="account-nav-link" href="/">Comprar</a></div></div></nav>
+    <main class="account-main"><div class="container">
+        <div class="mb-4"><div class="account-eyebrow">Área do cliente</div><h1 class="account-title mb-2">Os meus pedidos</h1><p class="account-subtitle mb-0">Consulte o estado e os detalhes das suas compras.</p></div>
+        <div class="account-card"><div class="account-card-header d-flex justify-content-between align-items-center"><h2 class="mb-0">Histórico de compras</h2><span class="account-badge">{{ orders|length }} pedido{{ orders|length|pluralize:"s" }}</span></div><div class="account-card-body p-0">{% for order in orders %}<a class="account-order-row d-flex justify-content-between align-items-center gap-3 border-bottom p-4" href="{% url 'accounts:order-detail' order_number=order.order_number %}"><span><strong class="account-order-number d-block">{{ order.order_number }}</strong><small class="account-muted">{{ order.created_at|date:"d/m/Y H:i" }} · {{ order.store_count }} loja{{ order.store_count|pluralize:"s" }}</small></span><span class="text-end"><strong class="d-block">{{ order.total }} {{ order.currency }}</strong><span class="account-badge">{{ order.get_status_display }}</span></span></a>{% empty %}<div class="account-empty"><i class="ri-file-list-3-line d-block mb-2" style="font-size: 30px;"></i>Ainda não tem pedidos registados.<br><a href="/" class="account-nav-link">Começar a comprar</a></div>{% endfor %}</div></div>
+    </div></main>
+    <footer class="account-footer"><div class="container d-flex justify-content-between"><span>© Marketplace Angola</span><span>Compras em AOA</span></div></footer>
+</body>
+</html>
