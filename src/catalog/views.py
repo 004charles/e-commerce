@@ -8,6 +8,7 @@ import json
 from django.db.models import Avg, Count
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
@@ -86,9 +87,41 @@ def product_list(request, category_slug=None):
         "province_filter": province_filter,
         "min_price": min_price,
         "max_price": max_price,
+        "catalog_data": {
+            "products": [_catalog_product_payload(request, product) for product in products],
+            "category_name": category.name if category else "Catálogo",
+            "category_url": request.build_absolute_uri(reverse("catalog:category", kwargs={"category_slug": category.slug})) if category else request.build_absolute_uri("/catalog/"),
+            "categories": [
+                {
+                    "name": item.name,
+                    "url": request.build_absolute_uri(reverse("catalog:category", kwargs={"category_slug": item.slug})),
+                    "count": item.products.filter(
+                        status=Product.Status.ACTIVE,
+                        store__status=Store.Status.APPROVED,
+                    ).count(),
+                }
+                for item in Category.objects.filter(is_active=True)
+            ],
+        },
     }
     return render(request, "catalog/list.html", context)
 
+
+
+def _catalog_product_payload(request, product):
+    pricing = price_context(product)
+    return {
+        "id": product.pk,
+        "name": product.name,
+        "store": product.store.name,
+        "price": f"{pricing['price']:.2f} Kz",
+        "compare_at_price": f"{pricing['original_price']:.2f} Kz" if pricing["original_price"] else "",
+        "discount_percent": f"{pricing['discount_percent']:.0f}",
+        "image": request.build_absolute_uri(product.image.url) if product.image else "",
+        "url": request.build_absolute_uri(product.get_absolute_url()),
+        "stock": product.stock,
+        "rating": float(product.rating or 0),
+    }
 
 
 def _normalize(value):
