@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Carreiras & Oportunidades - {{ site_settings.site_name|default:"Marketplace Angola" }}{% endblock %}
+
+{% block content %}
+<div class="section-box">
+  <div class="breadcrumbs-div">
+    <div class="container">
+      <ul class="breadcrumb">
+        <li><a class="font-xs color-gray-1000" href="{% url 'homepage:home' %}">Início</a></li>
+        <li><a class="font-xs color-gray-500" href="javascript:void(0)">Institucional</a></li>
+        <li><a class="font-xs color-gray-500" href="{% url 'homepage:careers' %}">Carreiras</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<section class="section-box shop-template mt-30">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 mx-auto page-content">
+        <h2 class="text-center mb-20">Trabalhe Connosco</h2>
+        <img class="mb-30 rounded img-fluid" src="{% static 'assets/imgs/page/about/team-2.jpg' %}" alt="Equipa Marketplace Angola">
+        
+        <p class="font-md color-gray-700 mb-20">
+          Acreditamos no talento angolano e na inovação digital como motores do comércio nacional. Estamos constantemente à procura de profissionais dedicados, apaixonados por tecnologia, logística e atendimento ao cliente.
+        </p>
+
+        <h4 class="mt-30 mb-15">Áreas de Atuação &amp; Vagas Recorrentes</h4>
+        <div class="row mt-20 mb-30">
+          <div class="col-md-6 mb-20">
+            <div class="p-4 border rounded bg-white shadow-sm">
+              <h5 class="text-brand mb-10"><i class="fi-rr-truck mr-5"></i> Logística e Operações</h5>
+              <p class="font-sm color-gray-600">Gestão de entregas, conferência de encomendas e apoio à frota em Luanda e províncias.</p>
+            </div>
+          </div>
+          <div class="col-md-6 mb-20">
+            <div class="p-4 border rounded bg-white shadow-sm">
+              <h5 class="text-brand mb-10"><i class="fi-rr-headset mr-5"></i> Atendimento ao Cliente</h5>
+              <p class="font-sm color-gray-600">Apoio a compradores e lojistas parceiros, suporte pós-venda e resolução ágil de pedidos.</p>
+            </div>
+          </div>
+          <div class="col-md-6 mb-20">
+            <div class="p-4 border rounded bg-white shadow-sm">
+              <h5 class="text-brand mb-10"><i class="fi-rr-laptop mr-5"></i> Tecnologia &amp; Desenvolvimento</h5>
+              <p class="font-sm color-gray-600">Desenvolvimento de software, infraestrutura de pagamentos e segurança de dados.</p>
+            </div>
+          </div>
+          <div class="col-md-6 mb-20">
+            <div class="p-4 border rounded bg-white shadow-sm">
+              <h5 class="text-brand mb-10"><i class="fi-rr-shop mr-5"></i> Gestão de Lojas &amp; Contas</h5>
+              <p class="font-sm color-gray-600">Captação, integração e consultoria de vendas para novos comerciantes parceiros.</p>
+            </div>
+          </div>
+        </div>
+
+        <h4 class="mt-30 mb-15">Envie a sua Candidatura</h4>
+        <p class="font-sm color-gray-700 mb-20">
+          Quer fazer parte da equipa que está a transformar as compras online em Angola? Envie o seu currículo e carta de apresentação para o nosso e-mail de recrutamento.
+        </p>
+        <div class="p-4 background-gray-50 rounded text-center">
+          <h5 class="mb-10">Contacto de Recrutamento</h5>
+          <p class="font-md color-gray-900 mb-15"><strong>recrutamento@marketplace.co.ao</strong></p>
+          <a class="btn btn-brand-2" href="mailto:recrutamento@marketplace.co.ao">Enviar Currículo</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

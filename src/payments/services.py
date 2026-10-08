@@ -1,12 +1,22 @@
 from abc import ABC, abstractmethod
 
 from django.db import transaction
+from django.conf import settings
 
-from .models import PaymentAttempt
+from .models import PaymentAttempt, PaymentProviderConfig
 
 
 class PaymentProvider(ABC):
     method = None
+
+    def __init__(self):
+        self.config = self._get_config()
+
+    def _get_config(self):
+        try:
+            return PaymentProviderConfig.objects.get(provider=self.method, is_active=True)
+        except PaymentProviderConfig.DoesNotExist:
+            return None
 
     @abstractmethod
     def start(self, attempt):
@@ -35,10 +45,28 @@ class PayPayProvider(PaymentProvider):
         return _pending_result(attempt, "PayPay ainda não está configurado.")
 
 
+class KyamiPayProvider(PaymentProvider):
+    method = PaymentAttempt.Method.KYAMI_PAY
+
+    def start(self, attempt):
+        if not self.config:
+            return _pending_result(attempt, "Kyami Pay não configurado no admin.")
+        
+        # TODO: Implementar integração real quando tiver as credenciais
+        # Exemplo de como acessar config:
+        # self.config.client_id
+        # self.config.client_secret
+        # self.config.api_base_url
+        # self.config.extra_config (dict)
+        
+        return _pending_result(attempt, "Kyami Pay: aguardando implementação (configure no admin).")
+
+
 PROVIDERS = {
     PaymentAttempt.Method.MULTICAIXA_EXPRESS: MulticaixaExpressProvider,
     PaymentAttempt.Method.UNITEL_MONEY: UnitelMoneyProvider,
     PaymentAttempt.Method.PAYPAY: PayPayProvider,
+    PaymentAttempt.Method.KYAMI_PAY: KyamiPayProvider,
 }
 
 

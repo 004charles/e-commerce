@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lojas Oficiais e Parceiros | {{ site_settings.site_name|default:"Marketplace Angola" }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<div class="section-box">
+  <div class="breadcrumbs-div">
+    <div class="container">
+      <ul class="breadcrumb">
+        <li><a class="font-xs color-gray-1000" href="{% url 'homepage:home' %}">Início</a></li>
+        <li><span class="font-xs color-gray-500">Lojas Parceiras</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<section class="section-box shop-template mt-0">
+  <div class="container">
+    <h2>Lojas Oficiais &amp; Vendedores</h2>
+    <div class="row align-items-center">
+      <div class="col-lg-6 mb-30">
+        <p class="font-md color-gray-500">Temos <span class="font-md-bold color-brand-3">{{ stores_count }}</span> lojas parceiras verificadas</p>
+      </div>
+      <div class="col-lg-6 mb-30 text-lg-end text-start">
+        <a class="font-sm color-gray-900 mr-30" href="javascript:void(0)">Suporte e Ajuda</a>
+        <a class="btn btn-buy w-auto font-sm-bold" href="/stores/apply/">Abrir a Minha Loja</a>
+      </div>
+    </div>
+    <div class="border-bottom pt-0 mb-30"></div>
+
+    <!-- Lista de Lojas -->
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="row mt-10">
+          {% for store in stores %}
+          <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12 mb-30">
+            <div class="card-vendor h-100">
+              <div class="card-top-vendor">
+                <div class="card-top-vendor-left">
+                  <a href="{% url 'stores:detail' slug=store.slug %}">
+                    {% if store.logo %}
+                      <img src="{{ store.logo.url }}" alt="{{ store.name }}" style="max-height: 40px; width: auto; object-fit: contain;">
+                    {% else %}
+                      <img src="{% static 'assets/imgs/page/vendor/futur.png' %}" alt="{{ store.name }}" style="max-height: 40px; width: auto; object-fit: contain;">
+                    {% endif %}
+                  </a>
+                  <div class="rating">
+                    <img src="{% static 'assets/imgs/template/icons/star.svg' %}" alt="star">
+                    <img src="{% static 'assets/imgs/template/icons/star.svg' %}" alt="star">
+                    <img src="{% static 'assets/imgs/template/icons/star.svg' %}" alt="star">
+                    <img src="{% static 'assets/imgs/template/icons/star.svg' %}" alt="star">
+                    <img src="{% static 'assets/imgs/template/icons/star.svg' %}" alt="star">
+                    <span class="font-xs color-gray-500"> (4.9)</span>
+                  </div>
+                </div>
+                <div class="card-top-vendor-right">
+                  <a class="btn btn-gray" href="{% url 'stores:detail' slug=store.slug %}">{{ store.active_products_count }} Produtos</a>
+                  <p class="font-xs color-gray-500 mt-10">Membro desde {{ store.created_at|date:"Y" }}</p>
+                </div>
+              </div>
+              <div class="card-bottom-vendor">
+                <a href="{% url 'stores:detail' slug=store.slug %}">
+                  <h6 class="font-md-bold color-brand-3 mb-10">{{ store.name }}</h6>
+                </a>
+                <p class="font-sm color-gray-500 location mb-10">
+                  {% if store.municipality %}{{ store.municipality }}, {% endif %}{{ store.province|default:"Luanda" }} Angola
+                </p>
+                <p class="font-sm color-gray-500 phone">
+                  {% if store.phone %}{{ store.phone }}{% else %}(+244) 923 000 000{% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="col-12 text-center py-50">
+            <h5 class="color-gray-500">Nenhuma loja encontrada de momento.</h5>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

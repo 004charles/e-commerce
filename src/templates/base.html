@@ -1,0 +1,482 @@
+{% load static %}
+{% load catalog_tags %}
+<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="msapplication-TileColor" content="#0E0E0E">
+    <meta name="template-color" content="#0E0E0E">
+    <meta name="description" content="{% if site_settings.tagline %}{{ site_settings.tagline }}{% else %}Marketplace Angola - Compre e Venda Online com Segurança{% endif %}">
+    <meta name="keywords" content="marketplace, angola, compras online, luanda, comercio eletronico">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/imgs/template/favicon.svg' %}">
+    <link href="{% static 'assets/css/style.css' %}?v=3.1.0" rel="stylesheet">
+    <title>{% block title %}{{ site_settings.site_name|default:"Marketplace Angola" }} - O Seu E-Commerce de Confiança{% endblock %}</title>
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body>
+    <!-- Preloader -->
+    <div id="preloader-active">
+      <div class="preloader d-flex align-items-center justify-content-center">
+        <div class="preloader-inner position-relative">
+          <div class="text-center">
+            <img class="mb-10" src="{% static 'assets/imgs/template/favicon.svg' %}" alt="Ecom">
+            <div class="preloader-dots"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Bar -->
+    {% if site_settings.shipping_message %}
+    <div class="box-notify"> 
+      <div class="container position-relative"> 
+        <div class="row"> 
+          <div class="col-lg-4 text-center text-lg-start"><span class="notify-text color-white">{{ site_settings.shipping_message }}</span></div>
+          <div class="col-lg-4 text-center"><span class="notify-text color-white">Entregas rápidas e seguras em todas as províncias de Angola</span></div>
+          <div class="col-lg-4 text-center text-lg-end"><span class="notify-text color-white">Pagamentos 100% seguros via Multicaixa Express</span></div>
+        </div>
+        <a class="btn btn-close" href="javascript:void(0)"></a>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="container-topbar">
+        <div class="menu-topbar-left d-none d-xl-block">
+          <ul class="nav-small">
+            <li><a class="font-xs" href="{% url 'homepage:home' %}">Início</a></li>
+            <li><a class="font-xs" href="/catalog/">Catálogo</a></li>
+            <li><a class="font-xs" href="/stores/">Lojas Parceiras</a></li>
+            <li><a class="font-xs" href="/stores/apply/">Abrir Loja</a></li>
+          </ul>
+        </div>
+        <div class="info-topbar text-center d-none d-xl-block">
+          <span class="font-xs color-brand-3">Entregas grátis em Luanda em compras selecionadas</span>
+        </div>
+        <div class="menu-topbar-right">
+          {% if site_settings.support_phone %}
+          <span class="font-xs color-brand-3">Apoio ao Cliente:</span>
+          <span class="font-sm-bold color-success"> {{ site_settings.support_phone }}</span>
+          {% endif %}
+          <div class="dropdown dropdown-language">
+            <button class="btn dropdown-toggle" id="dropdownLang" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="dropdown-right font-xs color-brand-3">
+                <img src="{% static 'assets/imgs/template/flag-pt.svg' %}" alt="AO" style="width:16px; margin-right:4px;"> Português
+              </span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownLang">
+              <li><a class="dropdown-item active" href="javascript:void(0)"><img src="{% static 'assets/imgs/template/flag-pt.svg' %}" alt="PT"> Português (AO)</a></li>
+              <li><a class="dropdown-item" href="javascript:void(0)"><img src="{% static 'assets/imgs/template/flag-en.svg' %}" alt="EN"> English</a></li>
+            </ul>
+          </div>
+          <div class="dropdown dropdown-language">
+            <button class="btn dropdown-toggle" id="dropdownCurrency" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="dropdown-right font-xs color-brand-3">{{ site_settings.currency_symbol|default:"Kz" }} ({{ site_settings.currency_code|default:"AOA" }})</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-light dropdown-menu-end" aria-labelledby="dropdownCurrency">
+              <li><a class="dropdown-item active" href="javascript:void(0)">Kwanza (AOA)</a></li>
+              <li><a class="dropdown-item" href="javascript:void(0)">USD ($)</a></li>
+              <li><a class="dropdown-item" href="javascript:void(0)">EUR (€)</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header Principal (Sticky) -->
+    <header class="header sticky-bar">
+      <div class="container">
+        <div class="main-header">
+          <div class="header-left">
+            <div class="header-logo">
+              <a class="d-flex align-items-center" href="{% url 'homepage:home' %}">
+                <img alt="{{ site_settings.site_name }}" src="{% static 'assets/imgs/template/logo.svg' %}" style="max-height: 44px;">
+              </a>
+            </div>
+            <div class="header-search">
+              <div class="box-header-search">
+                <form class="form-search" method="get" action="/catalog/">
+                  <div class="box-category">
+                    <select class="select-active" name="category">
+                      <option value="">Todas as categorias</option>
+                      {% for cat in global_categories %}
+                      <option value="{{ cat.slug }}">{{ cat.name }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="box-keysearch">
+                    <input class="form-control font-xs" type="text" name="q" placeholder="Pesquisar por produtos, marcas, lojas...">
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="header-nav">
+              <nav class="nav-main-menu d-none d-xl-block">
+                <ul class="main-menu">
+                  <li>
+                    <a class="active" href="{% url 'homepage:home' %}">Início</a>
+                  </li>
+                  <!-- Especialidades / Portais do E-Commerce -->
+                  <li class="has-children">
+                    <a href="javascript:void(0)">Departamentos</a>
+                    <ul class="sub-menu">
+                      <li><a href="/materiais-construcao/"><i class="fi-rr-building mr-5"></i> Materiais de Construção</a></li>
+                      <li><a href="/mobilias/"><i class="fi-rr-bed mr-5"></i> Mobílias de Casas</a></li>
+                      <li><a href="/criancas/"><i class="fi-rr-heart mr-5"></i> Materiais para Criança</a></li>
+                      <li><a href="/plantas-vasos/"><i class="fi-rr-flower mr-5"></i> Plantas e Vasos</a></li>
+                    </ul>
+                  </li>
+                  <li>
+                    <a href="/catalog/">Catálogo</a>
+                  </li>
+                  <li>
+                    <a href="/stores/">Lojas</a>
+                  </li>
+                </ul>
+              </nav>
+              <div class="burger-icon burger-icon-white">
+                <span class="burger-icon-top"></span>
+                <span class="burger-icon-mid"></span>
+                <span class="burger-icon-bottom"></span>
+              </div>
+            </div>
+            <div class="header-shop">
+              <!-- Conta de Usuário -->
+              <div class="d-inline-block box-dropdown-cart">
+                <span class="font-lg icon-list icon-account">
+                  <span>{% if user.is_authenticated %}{{ user.first_name|default:user.username }}{% else %}Conta{% endif %}</span>
+                </span>
+                <div class="dropdown-account">
+                  <ul>
+                    {% if user.is_authenticated %}
+                    <li><a href="/account/profile/">Meu Perfil</a></li>
+                    <li><a href="/orders/">Meus Pedidos</a></li>
+                    <li><a href="/account/logout/">Terminar Sessão</a></li>
+                    {% else %}
+                    <li><a href="/account/login/">Entrar (Login)</a></li>
+                    <li><a href="/account/register/">Criar Conta</a></li>
+                    <li><a href="/stores/apply/">Abrir Minha Loja</a></li>
+                    {% endif %}
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Carrinho Dropdown -->
+              <div class="d-inline-block box-dropdown-cart">
+                <span class="font-lg icon-list icon-cart">
+                  <span>Carrinho</span>
+                  <span class="number-item font-xs">{{ cart_count }}</span>
+                </span>
+                <div class="dropdown-cart">
+                  {% if cart_items %}
+                    {% for item in cart_items|slice:":4" %}
+                    <div class="item-cart mb-20">
+                      <div class="cart-image">
+                        {% if item.product.image %}
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                        {% else %}
+                        <img src="{% static 'assets/imgs/page/homepage1/imgsp5.png' %}" alt="{{ item.product.name }}">
+                        {% endif %}
+                      </div>
+                      <div class="cart-info">
+                        <a class="font-sm-bold color-brand-3 text-truncate d-block" href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
+                        <p><span class="color-brand-2 font-sm-bold">{{ item.quantity }} x {{ item.product|get_effective_price|currency }}</span></p>
+                      </div>
+                    </div>
+                    {% endfor %}
+                    <div class="border-bottom pt-0 mb-15"></div>
+                    <div class="cart-total">
+                      <div class="row">
+                        <div class="col-6 text-start"><span class="font-md-bold color-brand-3">Subtotal</span></div>
+                        <div class="col-6 text-end"><span class="font-md-bold color-brand-1">{{ cart_subtotal|currency }}</span></div>
+                      </div>
+                      <div class="row mt-15">
+                        <div class="col-6 text-start"><a class="btn btn-cart w-auto" href="/cart/">Ver Carrinho</a></div>
+                        <div class="col-6"><a class="btn btn-buy w-auto" href="/orders/checkout/">Finalizar</a></div>
+                      </div>
+                    </div>
+                  {% else %}
+                    <div class="text-center py-4">
+                      <p class="font-sm color-gray-500 mb-15">O seu carrinho está vazio</p>
+                      <a class="btn btn-brand-2 btn-sm" href="/catalog/">Explorar Produtos</a>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-header-active mobile-header-wrapper-style perfect-scrollbar">
+      <div class="mobile-header-wrapper-inner">
+        <div class="mobile-header-content-area">
+          <div class="mobile-logo">
+            <a class="d-flex" href="{% url 'homepage:home' %}">
+              <img alt="{{ site_settings.site_name }}" src="{% static 'assets/imgs/template/logo.svg' %}">
+            </a>
+          </div>
+          <div class="perfect-scroll">
+            <div class="mobile-menu-wrap mobile-header-border">
+              <nav class="mt-15">
+                <ul class="mobile-menu font-heading">
+                  <li><a class="active" href="{% url 'homepage:home' %}">Início</a></li>
+                  <li class="has-children"><a href="javascript:void(0)">Departamentos</a>
+                    <ul class="sub-menu">
+                      <li><a href="/materiais-construcao/">Materiais de Construção</a></li>
+                      <li><a href="/mobilias/">Mobílias de Casas</a></li>
+                      <li><a href="/criancas/">Materiais para Criança</a></li>
+                      <li><a href="/plantas-vasos/">Plantas e Vasos</a></li>
+                    </ul>
+                  </li>
+                  <li><a href="/catalog/">Catálogo Geral</a></li>
+                  <li><a href="/stores/">Lojas Parceiras</a></li>
+                  <li><a href="/cart/">Meu Carrinho</a></li>
+                  <li><a href="/orders/">Meus Pedidos</a></li>
+                </ul>
+              </nav>
+            </div>
+            <div class="mobile-account">
+              <div class="mobile-header-top">
+                <div class="user-account">
+                  <img src="{% static 'assets/imgs/template/ava_1.png' %}" alt="User">
+                  <div class="content">
+                    {% if user.is_authenticated %}
+                    <h6 class="user-name">Olá, <span class="text-brand">{{ user.first_name|default:user.username }}!</span></h6>
+                    <p class="font-xs text-muted">{{ user.email }}</p>
+                    {% else %}
+                    <h6 class="user-name"><a href="/account/login/" class="text-brand">Entrar</a> / <a href="/account/register/">Registar</a></h6>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <ul class="mobile-menu">
+                {% if user.is_authenticated %}
+                <li><a href="/account/profile/">Meu Perfil</a></li>
+                <li><a href="/orders/">Meus Pedidos</a></li>
+                <li><a href="/account/logout/">Sair</a></li>
+                {% else %}
+                <li><a href="/account/login/">Iniciar Sessão</a></li>
+                <li><a href="/account/register/">Criar Nova Conta</a></li>
+                {% endif %}
+              </ul>
+            </div>
+            <div class="site-copyright color-gray-400 mt-30">
+              © 2026 {{ site_settings.site_name|default:"Marketplace Angola" }}. Todos os direitos reservados.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quickmenu Bar (Departamentos & Destaques Rápidos) -->
+    <div class="section-box box-quickmenu">
+      <div class="container">
+        <div class="box-inner-quickmenu">
+          <ul>
+            <li><a href="/materiais-construcao/"><strong class="color-brand-1"><i class="fi-rr-hammer"></i> Materiais de Construção</strong></a></li>
+            <li><a href="/mobilias/"><strong class="color-brand-1"><i class="fi-rr-couch"></i> Mobílias de Casas</strong></a></li>
+            <li><a href="/criancas/"><strong class="color-brand-1"><i class="fi-rr-teddy-bear"></i> Materiais para Criança</strong></a></li>
+            <li><a href="/plantas-vasos/"><strong class="color-brand-1"><i class="fi-rr-leaf"></i> Plantas &amp; Vasos</strong></a></li>
+            <li><a href="/catalog/?deal=1"><span class="color-danger font-bold">🔥 Super Ofertas</span></a></li>
+            <li><a href="/catalog/?new=1">Novidades</a></li>
+            <li><a href="/stores/">Lojas Oficiais</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <main class="main">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- Benefícios / Garantias -->
+    <section class="section-box mt-90 mb-50">
+      <div class="container">
+        <ul class="list-col-5">
+          <li>
+            <div class="item-list">
+              <div class="icon-left"><img src="{% static 'assets/imgs/template/delivery.svg' %}" alt="Entrega"></div>
+              <div class="info-right">
+                <h5 class="font-lg-bold color-gray-100">Entregas em Angola</h5>
+                <p class="font-sm color-gray-500">Envio rápido em Luanda e províncias</p>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="item-list">
+              <div class="icon-left"><img src="{% static 'assets/imgs/template/support.svg' %}" alt="Suporte"></div>
+              <div class="info-right">
+                <h5 class="font-lg-bold color-gray-100">Suporte Dedicado</h5>
+                <p class="font-sm color-gray-500">Atendimento ao cliente de confiança</p>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="item-list">
+              <div class="icon-left"><img src="{% static 'assets/imgs/template/voucher.svg' %}" alt="Garantia"></div>
+              <div class="info-right">
+                <h5 class="font-lg-bold color-gray-100">Garantia &amp; Qualidade</h5>
+                <p class="font-sm color-gray-500">Produtos verificados por lojas reais</p>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="item-list">
+              <div class="icon-left"><img src="{% static 'assets/imgs/template/return.svg' %}" alt="Devolução"></div>
+              <div class="info-right">
+                <h5 class="font-lg-bold color-gray-100">Devoluções Fáceis</h5>
+                <p class="font-sm color-gray-500">Proteção total ao comprador</p>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="item-list">
+              <div class="icon-left"><img src="{% static 'assets/imgs/template/secure.svg' %}" alt="Segurança"></div>
+              <div class="info-right">
+                <h5 class="font-lg-bold color-gray-100">Pagamento Seguro</h5>
+                <p class="font-sm color-gray-500">Multicaixa Express e Transferência</p>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="section-box box-newsletter">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-6 col-md-7 col-sm-12">
+            <h3 class="color-white">{{ site_settings.newsletter_title|default:"Subscreva e Receba Ofertas Exclusivas" }}</h3>
+            <p class="font-lg color-white">{{ site_settings.newsletter_description|default:"Fique a par das melhores promoções, novos produtos e descontos semanais." }}</p>
+          </div>
+          <div class="col-lg-6 col-md-5 col-sm-12">
+            <div class="box-form-newsletter mt-15">
+              <form class="form-newsletter" action="javascript:void(0)">
+                <input class="input-newsletter font-xs" type="email" placeholder="O seu endereço de e-mail...">
+                <button class="btn btn-brand-2" type="submit">Subscrever</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-1">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-3 width-25 mb-30">
+              <h4 class="mb-30 color-gray-1000">Contacto &amp; Suporte</h4>
+              {% if site_settings.contact_address %}
+              <div class="font-md mb-20 color-gray-900"><strong class="font-md-bold">Morada:</strong> {{ site_settings.contact_address }}</div>
+              {% endif %}
+              {% if site_settings.support_phone %}
+              <div class="font-md mb-20 color-gray-900"><strong class="font-md-bold">Telefone:</strong> {{ site_settings.support_phone }}</div>
+              {% endif %}
+              {% if site_settings.support_email %}
+              <div class="font-md mb-20 color-gray-900"><strong class="font-md-bold">E-mail:</strong> {{ site_settings.support_email }}</div>
+              {% endif %}
+              <div class="font-md mb-20 color-gray-900"><strong class="font-md-bold">Horário:</strong> Segunda a Sábado: 8h - 18h</div>
+              <div class="mt-30">
+                {% if site_settings.facebook_url %}<a class="icon-socials icon-facebook" href="{{ site_settings.facebook_url }}" target="_blank"></a>{% endif %}
+                {% if site_settings.instagram_url %}<a class="icon-socials icon-instagram" href="{{ site_settings.instagram_url }}" target="_blank"></a>{% endif %}
+                {% if site_settings.whatsapp_url %}<a class="icon-socials icon-twitter" href="{{ site_settings.whatsapp_url }}" target="_blank"></a>{% endif %}
+              </div>
+            </div>
+            <div class="col-lg-3 width-20 mb-30">
+              <h4 class="mb-30 color-gray-1000">Departamentos</h4>
+              <ul class="menu-footer">
+                <li><a href="/materiais-construcao/">Materiais de Construção</a></li>
+                <li><a href="/mobilias/">Mobílias de Casas</a></li>
+                <li><a href="/criancas/">Materiais para Criança</a></li>
+                <li><a href="/plantas-vasos/">Plantas e Vasos</a></li>
+                <li><a href="/catalog/">Todos os Departamentos</a></li>
+              </ul>
+            </div>
+            <div class="col-lg-3 width-16 mb-30">
+              <h4 class="mb-30 color-gray-1000">Marketplace</h4>
+              <ul class="menu-footer">
+                <li><a href="/stores/">Lojas Parceiras</a></li>
+                <li><a href="/stores/apply/">Torne-se Vendedor</a></li>
+                <li><a href="/catalog/?deal=1">Super Promoções</a></li>
+                <li><a href="/catalog/?new=1">Novos Artigos</a></li>
+              </ul>
+            </div>
+            <div class="col-lg-3 width-16 mb-30">
+              <h4 class="mb-30 color-gray-1000">Minha Conta</h4>
+              <ul class="menu-footer">
+                <li><a href="/account/profile/">Perfil de Utilizador</a></li>
+                <li><a href="/orders/">Histórico de Compras</a></li>
+                <li><a href="/cart/">Carrinho Atual</a></li>
+                <li><a href="/account/login/">Iniciar Sessão</a></li>
+              </ul>
+            </div>
+            <div class="col-lg-3 width-23">
+              <h4 class="mb-30 color-gray-1000">Pagamentos em Angola</h4>
+              <div>
+                <p class="font-md color-gray-900">Aceitamos pagamentos rápidos, práticos e 100% seguros:</p>
+                <div class="mt-20">
+                  <span class="badge bg-brand-2 p-2 mr-5">Multicaixa Express</span>
+                  <span class="badge bg-brand-1 p-2 mr-5">Transferência Bancária</span>
+                </div>
+                <p class="font-md color-gray-900 mt-20 mb-10">Garantia e Proteção ao Cliente</p>
+                <img src="{% static 'assets/imgs/template/payment-method.png' %}" alt="Formas de Pagamento">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-2">
+        <div class="container">
+          <div class="footer-bottom mt-20">
+            <div class="row">
+              <div class="col-lg-6 col-md-12 text-center text-lg-start">
+                <span class="color-gray-900 font-sm">© 2026 {{ site_settings.site_name|default:"Marketplace Angola" }}. Todos os direitos reservados.</span>
+              </div>
+              <div class="col-lg-6 col-md-12 text-center text-lg-end">
+                <ul class="menu-bottom">
+                  <li><a class="font-sm color-gray-900" href="javascript:void(0)">Termos de Uso</a></li>
+                  <li><a class="font-sm color-gray-900" href="javascript:void(0)">Privacidade</a></li>
+                  <li><a class="font-sm color-gray-900" href="javascript:void(0)">Segurança de Pagamento</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scripts do Template -->
+    <script src="{% static 'assets/js/vendors/modernizr-3.6.0.min.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/jquery-migrate-3.3.0.min.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/waypoints.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/wow.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/magnific-popup.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/perfect-scrollbar.min.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/select2.min.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/isotope.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/scrollup.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/swiper-bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/noUISlider.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/slider.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/counterup.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/jquery.countdown.min.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/jquery.elevatezoom.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/slick.js' %}"></script>
+    <script src="{% static 'assets/js/main.js' %}"></script>
+    <script src="{% static 'assets/js/shop.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

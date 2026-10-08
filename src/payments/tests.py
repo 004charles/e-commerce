@@ -43,10 +43,8 @@ class PaymentFlowTests(TestCase):
             {"method": PaymentAttempt.Method.MULTICAIXA_EXPRESS},
         )
 
-        self.assertRedirects(
-            response,
-            reverse("payments:pending", kwargs={"order_number": self.order.order_number}),
-        )
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(response.json()["ok"])
         attempt = PaymentAttempt.objects.get(order=self.order)
         self.assertEqual(attempt.method, PaymentAttempt.Method.MULTICAIXA_EXPRESS)
         self.assertEqual(attempt.status, PaymentAttempt.Status.PENDING)
@@ -59,7 +57,8 @@ class PaymentFlowTests(TestCase):
             reverse("payments:select", kwargs={"order_number": self.order.order_number})
         )
 
-        self.assertRedirects(response, "/")
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(response.json()["ok"])
         self.assertEqual(PaymentAttempt.objects.count(), 0)
 
     def test_payment_selection_displays_all_supported_methods(self):
@@ -68,7 +67,7 @@ class PaymentFlowTests(TestCase):
             reverse("payments:select", kwargs={"order_number": self.order.order_number})
         )
 
-        self.assertContains(response, "Multicaixa Express")
-        self.assertContains(response, "Unitel Money")
-        self.assertContains(response, "PayPay")
-        self.assertContains(response, "não efetua cobranças fictícias")
+        labels = [method["label"] for method in response.json()["methods"]]
+        self.assertIn("Multicaixa Express", labels)
+        self.assertIn("Unitel Money", labels)
+        self.assertIn("PayPay", labels)

@@ -1,103 +1,176 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Checkout — Marketplace Angola</title>
-    <link rel="stylesheet" href="/assets/css/vendors/bootstrap.css">
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <style>
-        .checkout-page { background: #f8f8f8; min-height: 100vh; padding: 48px 0 72px; }
-        .checkout-card { background: #fff; border-radius: 10px; padding: 26px; box-shadow: 0 5px 24px rgba(0,0,0,.05); }
-        .checkout-section-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; }
-        .checkout-item { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #eee; }
-        .checkout-item img { width: 58px; height: 58px; object-fit: cover; border-radius: 6px; background: #f5f5f5; }
-        .checkout-item-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-        .checkout-item-meta { color: #777; font-size: 12px; }
-        .checkout-store { border-bottom: 1px solid #eee; padding: 16px 0 6px; }
-        .checkout-store:last-child { border-bottom: 0; }
-        .checkout-store-name { font-weight: 600; color: #222; }
-        .checkout-total { border-top: 1px solid #ddd; margin-top: 18px; padding-top: 18px; font-size: 20px; font-weight: 700; }
-        .checkout-note { background: #fff8e6; border-left: 3px solid #f0ad00; color: #725500; padding: 12px 14px; font-size: 13px; }
-        .checkout-error { background: #fff0f0; color: #a80000; padding: 12px 14px; border-radius: 6px; margin-bottom: 18px; }
-        .checkout-empty-link { color: inherit; text-decoration: underline; }
-    </style>
-</head>
-<body>
-    <main class="checkout-page">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <p class="text-muted mb-1">Marketplace Angola</p>
-                    <h1 class="h3 mb-0">Finalizar pedido</h1>
+{% load catalog_tags %}
+
+{% block title %}Finalizar Compra (Checkout) - {{ site_settings.site_name|default:"Marketplace Angola" }}{% endblock %}
+
+{% block content %}
+<div class="section-box">
+  <div class="breadcrumbs-div">
+    <div class="container">
+      <ul class="breadcrumb">
+        <li><a class="font-xs color-gray-1000" href="{% url 'homepage:home' %}">Início</a></li>
+        <li><a class="font-xs color-gray-500" href="/catalog/">Catálogo</a></li>
+        <li><a class="font-xs color-gray-500" href="/cart/">Carrinho</a></li>
+        <li><a class="font-xs color-gray-500 active" href="javascript:void(0)">Finalizar Compra</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<section class="section-box shop-template">
+  <div class="container">
+    <form method="post" action="/orders/checkout/">
+      {% csrf_token %}
+      <div class="row">
+        <!-- Dados do Comprador e Entrega -->
+        <div class="col-lg-7 mb-30">
+          <div class="box-border p-4 bg-white rounded border shadow-sm">
+            <h4 class="color-brand-3 mb-20"><i class="fi-rr-user mr-5"></i> Informações do Comprador &amp; Entrega</h4>
+            
+            <div class="row">
+              <div class="col-lg-6 mb-15">
+                <div class="form-group">
+                  <label class="font-xs text-muted mb-5">Nome Completo *</label>
+                  <input class="form-control font-sm" type="text" name="customer_name" value="{% if user.is_authenticated %}{{ user.get_full_name|default:user.username }}{% endif %}" placeholder="Ex: António Manuel" required>
                 </div>
-                <a href="/" class="btn btn-outline-secondary">Continuar a comprar</a>
+              </div>
+              <div class="col-lg-6 mb-15">
+                <div class="form-group">
+                  <label class="font-xs text-muted mb-5">E-mail de Contacto *</label>
+                  <input class="form-control font-sm" type="email" name="customer_email" value="{% if user.is_authenticated %}{{ user.email }}{% endif %}" placeholder="exemplo@dominio.ao" required>
+                </div>
+              </div>
+              <div class="col-lg-6 mb-15">
+                <div class="form-group">
+                  <label class="font-xs text-muted mb-5">Telefone Principal (WhatsApp) *</label>
+                  <input class="form-control font-sm" type="tel" name="customer_phone" placeholder="+244 923 000 000" required>
+                </div>
+              </div>
+              <div class="col-lg-6 mb-15">
+                <div class="form-group">
+                  <label class="font-xs text-muted mb-5">Província de Entrega *</label>
+                  <select class="form-control font-sm select-style1" name="shipping_province" required>
+                    <option value="Luanda" selected>Luanda</option>
+                    <option value="Benguela">Benguela</option>
+                    <option value="Huíla">Huíla</option>
+                    <option value="Huambo">Huambo</option>
+                    <option value="Cabinda">Cabinda</option>
+                    <option value="Cuanza Sul">Cuanza Sul</option>
+                    <option value="Cuanza Norte">Cuanza Norte</option>
+                    <option value="Uíge">Uíge</option>
+                    <option value="Zaire">Zaire</option>
+                    <option value="Malanje">Malanje</option>
+                    <option value="Namibe">Namibe</option>
+                    <option value="Cunene">Cunene</option>
+                    <option value="Bié">Bié</option>
+                    <option value="Moxico">Moxico</option>
+                    <option value="Lunda Norte">Lunda Norte</option>
+                    <option value="Lunda Sul">Lunda Sul</option>
+                    <option value="Bengo">Bengo</option>
+                    <option value="Cuando Cubango">Cuando Cubango</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-lg-6 mb-15">
+                <div class="form-group">
+                  <label class="font-xs text-muted mb-5">Município / Bairro *</label>
+                  <input class="form-control font-sm" type="text" name="shipping_municipality" placeholder="Ex: Talatona / Benfica" required>
+                </div>
+              </div>
+              <div class="col-lg-6 mb-15">
+                <div class="form-group">
+                  <label class="font-xs text-muted mb-5">Ponto de Referência</label>
+                  <input class="form-control font-sm" type="text" name="shipping_landmark" placeholder="Ex: Próximo ao Kero Talatona">
+                </div>
+              </div>
+              <div class="col-lg-12 mb-15">
+                <div class="form-group">
+                  <label class="font-xs text-muted mb-5">Endereço Completo de Entrega (Rua, Casa/Edifício) *</label>
+                  <input class="form-control font-sm" type="text" name="shipping_address" placeholder="Rua das Palmeiras, Condomínio Boa Vida, Casa 12" required>
+                </div>
+              </div>
+              <div class="col-lg-12 mb-15">
+                <div class="form-group">
+                  <label class="font-xs text-muted mb-5">Instruções Adicionais de Entrega (Opcional)</label>
+                  <textarea class="form-control font-sm" name="notes" placeholder="Alguma observação sobre o horário ou ponto de entrega..." rows="3"></textarea>
+                </div>
+              </div>
             </div>
 
-            <form method="post" novalidate>
-                {% csrf_token %}
-                <div class="row g-4">
-                    <div class="col-lg-7">
-                        <div class="checkout-card">
-                            <h2 class="checkout-section-title">Dados de entrega</h2>
-                            {% if form.non_field_errors %}
-                                <div class="checkout-error">{{ form.non_field_errors }}</div>
-                            {% endif %}
-                            <div class="row g-3">
-                                {% for field in form %}
-                                    <div class="{% if field.name == 'address' or field.name == 'address_details' or field.name == 'notes' %}col-12{% else %}col-md-6{% endif %}">
-                                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                        {{ field }}
-                                        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
-                                        {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
-                                    </div>
-                                {% endfor %}
-                            </div>
-                            <div class="checkout-note mt-4">
-                                <strong>Pagamento:</strong> o pedido será criado como “a aguardar pagamento”. As integrações Multicaixa Express, Unitel Money e PayPay serão adicionadas numa etapa própria, sem processar pagamentos fictícios nesta versão.
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100 mt-4">Confirmar pedido</button>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-5">
-                        <div class="checkout-card">
-                            <h2 class="checkout-section-title">Resumo do carrinho</h2>
-                            {% for group in cart.groups %}
-                                <div class="checkout-store">
-                                    <div class="checkout-store-name mb-1">{{ group.store_name }}</div>
-                                    {% for item in group.items %}
-                                        <div class="checkout-item">
-                                            {% if item.image %}<img src="/media/{{ item.image }}" alt="{{ item.name }}">{% endif %}
-                                            <div class="flex-grow-1">
-                                                <div class="checkout-item-name">{{ item.name }}</div>
-                                                <div class="checkout-item-meta">{{ item.quantity }} × {{ item.price }} Kz</div>
-                                            </div>
-                                            <strong>{{ item.line_total }} Kz</strong>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            {% empty %}
-                                <p class="text-muted">O carrinho está vazio. <a class="checkout-empty-link" href="/">Voltar à loja</a></p>
-                            {% endfor %}
-                            <div class="d-flex justify-content-between mt-4">
-                                <span>Subtotal</span>
-                                <strong>{{ cart.subtotal }} Kz</strong>
-                            </div>
-                            <div class="d-flex justify-content-between mt-2 text-muted">
-                                <span>Envio</span>
-                                <span>Calculado com a loja</span>
-                            </div>
-                            <div class="checkout-total d-flex justify-content-between">
-                                <span>Total</span>
-                                <span>{{ cart.subtotal }} Kz</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
+            <!-- Método de Pagamento -->
+            <h5 class="color-brand-3 mt-20 mb-15"><i class="fi-rr-wallet mr-5"></i> Método de Pagamento</h5>
+            <div class="form-check p-3 border rounded mb-10 bg-light">
+              <input class="form-check-input" type="radio" name="payment_method" id="pay_express" value="multicaixa_express" checked>
+              <label class="form-check-label font-sm-bold color-brand-3" for="pay_express">
+                Multicaixa Express (Pagamento Rápido no Telefone)
+              </label>
+              <p class="font-xs text-muted mt-5 mb-0">Receberá uma solicitação no seu telemóvel para autorizar o pagamento com segurança.</p>
+            </div>
+            <div class="form-check p-3 border rounded mb-20 bg-light">
+              <input class="form-check-input" type="radio" name="payment_method" id="pay_bank" value="bank_transfer">
+              <label class="form-check-label font-sm-bold color-brand-3" for="pay_bank">
+                Transferência Bancária (IBAN)
+              </label>
+              <p class="font-xs text-muted mt-5 mb-0">Receberá as coordenadas bancárias para anexar o comprovativo.</p>
+            </div>
+          </div>
         </div>
-    </main>
-</body>
-</html>
+
+        <!-- Resumo do Pedido -->
+        <div class="col-lg-5 mb-30">
+          <div class="box-border p-4 bg-white rounded border shadow-sm">
+            <h4 class="font-md-bold mb-20 color-brand-3">Artigos do Pedido</h4>
+            <div class="listCheckout mb-20">
+              {% if cart_items %}
+                {% for item in cart_items %}
+                <div class="d-flex align-items-center justify-content-between border-bottom pb-15 mb-15">
+                  <div class="d-flex align-items-center">
+                    <div style="width: 50px; height: 50px; overflow: hidden; border-radius: 4px; margin-right: 12px;">
+                      {% if item.product.image %}
+                      <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                      {% else %}
+                      <img src="{% static 'assets/imgs/page/homepage1/imgsp5.png' %}" alt="{{ item.product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                      {% endif %}
+                    </div>
+                    <div>
+                      <h6 class="font-xs color-brand-3 mb-5">{{ item.product.name|truncatechars:28 }}</h6>
+                      <span class="font-xs text-muted">{{ item.quantity }} x {{ item.product|get_effective_price|currency }}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <strong class="font-sm color-brand-1">{{ item.total|currency }}</strong>
+                  </div>
+                </div>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            <div class="d-flex justify-content-between mb-10">
+              <span class="font-sm color-gray-600">Subtotal</span>
+              <strong class="font-md color-brand-3">{{ cart_subtotal|currency }}</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-15">
+              <span class="font-sm color-gray-600">Taxa de Envio</span>
+              <strong class="font-sm text-success">A Combinar / Grátis</strong>
+            </div>
+            <div class="border-bottom mb-15"></div>
+            <div class="d-flex justify-content-between mb-25">
+              <span class="font-lg-bold color-brand-3">Total a Pagar</span>
+              <span class="font-xl-bold color-brand-1">{{ cart_subtotal|currency }}</span>
+            </div>
+
+            <button type="submit" class="btn btn-buy w-100 text-center py-3 font-md-bold">
+              <i class="fi-rr-lock mr-5"></i> Confirmar e Pagar Pedido
+            </button>
+
+            <div class="mt-20 text-center">
+              <a href="/cart/" class="font-xs color-brand-1"><i class="fi-rr-arrow-left"></i> Voltar para o carrinho</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

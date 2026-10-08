@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Criar Conta - {{ site_settings.site_name|default:"Marketplace Angola" }}{% endblock %}
+
+{% block content %}
+<div class="section-box">
+  <div class="breadcrumbs-div">
+    <div class="container">
+      <ul class="breadcrumb">
+        <li><a class="font-xs color-gray-1000" href="{% url 'homepage:home' %}">Início</a></li>
+        <li><a class="font-xs color-gray-500" href="javascript:void(0)">Conta</a></li>
+        <li><a class="font-xs color-gray-500 active" href="{% url 'accounts:register' %}">Criar Conta</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<section class="section-box shop-template mt-40 mb-60">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6 col-md-8 mx-auto">
+        <div class="box-border p-4 bg-white rounded border shadow-sm">
+          <h3 class="color-brand-3 mb-10">Criar Nova Conta</h3>
+          <p class="font-sm color-gray-500 mb-30">Registe-se para comprar com rapidez, acompanhar encomendas e desfrutar de ofertas exclusivas.</p>
+          
+          {% if error_message %}
+          <div class="alert alert-danger font-sm">{{ error_message }}</div>
+          {% endif %}
+
+          <form class="form-register" method="post" action="{% url 'accounts:register' %}">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6 mb-15">
+                <div class="form-group">
+                  <label class="mb-5 font-sm color-gray-700 font-bold">Primeiro Nome *</label>
+                  <input class="form-control" type="text" name="first_name" placeholder="Ex: Manuel" required>
+                </div>
+              </div>
+              <div class="col-md-6 mb-15">
+                <div class="form-group">
+                  <label class="mb-5 font-sm color-gray-700 font-bold">Sobrenome *</label>
+                  <input class="form-control" type="text" name="last_name" placeholder="Ex: Santos" required>
+                </div>
+              </div>
+            </div>
+            <div class="form-group mb-15">
+              <label class="mb-5 font-sm color-gray-700 font-bold">Nome de Utilizador (Username) *</label>
+              <input class="form-control" type="text" name="username" placeholder="manuel_santos" required>
+            </div>
+            <div class="form-group mb-15">
+              <label class="mb-5 font-sm color-gray-700 font-bold">Endereço de E-mail *</label>
+              <input class="form-control" type="email" name="email" placeholder="manuel@exemplo.ao" required>
+            </div>
+            <div class="form-group mb-15">
+              <label class="mb-5 font-sm color-gray-700 font-bold">Palavra-passe (Senha) *</label>
+              <input class="form-control" type="password" name="password" placeholder="Mínimo 8 caracteres" required>
+            </div>
+            <div class="form-group mb-20">
+              <label class="mb-5 font-sm color-gray-700 font-bold">Confirmar Palavra-passe *</label>
+              <input class="form-control" type="password" name="password_confirm" placeholder="Repita a palavra-passe" required>
+            </div>
+            <div class="form-group mb-20">
+              <label class="color-gray-500 font-xs">
+                <input class="checkagree mr-5" type="checkbox" required> Concordo com os <a href="/termos/" class="color-brand-1">Termos de Utilização</a> e Política de Privacidade.
+              </label>
+            </div>
+            <div class="form-group mb-20">
+              <button class="font-md-bold btn btn-buy w-100" type="submit">Criar Minha Conta</button>
+            </div>
+            <div class="text-center mt-20">
+              <span class="font-xs color-gray-500 font-medium">Já tem uma conta?</span>
+              <a class="font-xs color-brand-1 font-bold ml-5" href="{% url 'accounts:login' %}">Iniciar Sessão</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

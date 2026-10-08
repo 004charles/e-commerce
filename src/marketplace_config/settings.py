@@ -8,6 +8,9 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
     ".manus.computer",
+    "testserver",
+    "192.168.146.32",
+    "0.0.0.0",
 ]
 CSRF_TRUSTED_ORIGINS = ["https://*.manus.computer"]
 
@@ -44,13 +47,14 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [BASE_DIR / "templates"],
-        "APP_DIRS": True,
+        "APP_DIRS": True, 
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "marketplace_config.context_processors.admin_metrics",
+                "marketplace_config.context_processors.global_context",
             ],
         },
     },

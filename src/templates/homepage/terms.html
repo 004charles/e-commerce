@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Termos e Condições de Uso - {{ site_settings.site_name|default:"Marketplace Angola" }}{% endblock %}
+
+{% block content %}
+<div class="section-box">
+  <div class="breadcrumbs-div">
+    <div class="container">
+      <ul class="breadcrumb">
+        <li><a class="font-xs color-gray-1000" href="{% url 'homepage:home' %}">Início</a></li>
+        <li><a class="font-xs color-gray-500" href="javascript:void(0)">Institucional</a></li>
+        <li><a class="font-xs color-gray-500" href="{% url 'homepage:terms' %}">Termos e Condições</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<section class="section-box shop-template mt-30">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 mx-auto page-content">
+        <h2 class="text-center mb-20">Termos e Condições de Utilização</h2>
+        <p class="font-xs text-muted text-center mb-40">Última atualização: Outubro de 2026</p>
+
+        <h4 class="mb-15">1. Apresentação e Âmbito</h4>
+        <p class="font-sm color-gray-700 mb-20">
+          Bem-vindo ao <strong>{{ site_settings.site_name|default:"Marketplace Angola" }}</strong>. Ao aceder, navegar ou realizar encomendas na nossa plataforma, o utilizador concorda e aceita cumprir integralmente os presentes Termos e Condições, bem como as leis e regulamentos aplicáveis na República de Angola.
+        </p>
+
+        <h4 class="mb-15">2. Lojas Parceiras e Vendedores</h4>
+        <p class="font-sm color-gray-700 mb-20">
+          O Marketplace opera como uma plataforma de comércio eletrónico multivendedor, conectando compradores a lojas e comerciantes registados e verificados. Cada loja parceira é responsável pela exatidão dos seus produtos, descrições, estoques e garantias legais correspondentes.
+        </p>
+
+        <h4 class="mb-15">3. Preços e Moeda de Pagamento</h4>
+        <p class="font-sm color-gray-700 mb-20">
+          Todos os preços indicados na plataforma são expressos em <strong>Kwanzas Angolanos (Kz / AOA)</strong> e incluem todas as taxas aplicáveis. Os métodos de pagamento aceites incluem Multicaixa Express e Transferência Bancária validada.
+        </p>
+
+        <h4 class="mb-15">4. Entregas e Prazos</h4>
+        <p class="font-sm color-gray-700 mb-20">
+          As entregas são efetuadas na província de Luanda e nas restantes províncias de Angola através dos serviços logísticos integrados ou parceiros de transporte das respetivas lojas. O prazo estimado de entrega é informado no momento da finalização do pedido.
+        </p>
+
+        <h4 class="mb-15">5. Política de Devoluções e Reembolsos</h4>
+        <p class="font-sm color-gray-700 mb-20">
+          O comprador tem o direito de solicitar a troca ou devolução de artigos com defeito de fabrico ou desconformidade no prazo de garantia após a receção, de acordo com as normas de proteção ao consumidor em vigor.
+        </p>
+
+        <h4 class="mb-15">6. Privacidade e Proteção de Dados</h4>
+        <p class="font-sm color-gray-700 mb-30">
+          Os dados pessoais fornecidos são tratados com confidencialidade e segurança, sendo utilizados exclusivamente para o processamento de encomendas, comunicações sobre o estado dos pedidos e melhoria contínua da experiência do cliente.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

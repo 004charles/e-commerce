@@ -1,37 +1,92 @@
 from decimal import Decimal, InvalidOperation
 from django.db import models
-from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
 from django.urls import reverse
 from unicodedata import combining as unicode_combining
 from unicodedata import normalize as unicode_normalize
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_GET
 
 from catalog.models import Category, Product
 from catalog.pricing import price_context
+from marketplace_config.api import (
+    ok,
+    serialize_category,
+    serialize_product,
+    serialize_store,
+)
 from stores.models import Store
 
 from .models import HomepageBanner, HomepageLink, HomepageTextBlock, SiteSettings
 
 
-@ensure_csrf_cookie
+@require_GET
 def home(request):
+    """GET / — Renderiza a página inicial (template index-9) ou retorna JSON se requisitado."""
+    accept_header = request.headers.get("Accept", "")
+    is_json = (
+        request.GET.get("format") == "json"
+        or (request.headers.get("x-requested-with") == "XMLHttpRequest" and "text/html" not in accept_header)
+        or ("application/json" in accept_header and "text/html" not in accept_header)
+    )
+
+    active = Product.objects.filter(
+        status=Product.Status.ACTIVE,
+        store__status=Store.Status.APPROVED,
+    ).select_related("store", "category")
+
+    if is_json:
+        return ok(
+            {
+                "featured_products": [
+                    serialize_product(request, p) for p in active.filter(featured=True)[:12]
+                ],
+                "new_products": [
+                    serialize_product(request, p) for p in active.order_by("-created_at")[:12]
+                ],
+                "best_rated": [
+                    serialize_product(request, p)
+                    for p in active.order_by("-rating", "-review_count")[:12]
+                ],
+                "deals": [
+                    serialize_product(request, p)
+                    for p in active.filter(compare_at_price__isnull=False, stock__gt=0)[:12]
+                ],
+                "categories": [
+                    serialize_category(request, c)
+                    for c in Category.objects.filter(is_active=True)[:12]
+                ],
+                "stores": [
+                    serialize_store(request, s)
+                    for s in Store.objects.filter(
+                        status=Store.Status.APPROVED, featured=True
+                    )[:8]
+                ],
+            }
+        )
+
+    now = timezone.now()
+    banners = HomepageBanner.objects.filter(is_active=True).filter(
+        models.Q(starts_at__isnull=True) | models.Q(starts_at__lte=now),
+        models.Q(ends_at__isnull=True) | models.Q(ends_at__gt=now),
+    )
+    hero_banners = [b for b in banners if b.placement == HomepageBanner.Placement.HERO]
+    promo_banners = [b for b in banners if b.placement == HomepageBanner.Placement.PROMOTION]
+
+    featured_products = active.filter(featured=True)[:12]
+    new_products = active.order_by("-created_at")[:12]
+    best_rated = active.order_by("-rating", "-review_count")[:12]
+    deals = active.filter(compare_at_price__isnull=False, stock__gt=0)[:12]
+    stores = Store.objects.filter(status=Store.Status.APPROVED, featured=True)[:8]
+
     context = {
-        "featured_products": Product.objects.filter(
-            status=Product.Status.ACTIVE,
-            featured=True,
-            store__status=Store.Status.APPROVED,
-        ).select_related("store", "category")[:12],
-        "new_products": Product.objects.filter(
-            status=Product.Status.ACTIVE,
-            store__status=Store.Status.APPROVED,
-        ).select_related("store", "category")[:12],
-        "featured_categories": Category.objects.filter(is_active=True)[:12],
-        "featured_stores": Store.objects.filter(
-            status=Store.Status.APPROVED,
-            featured=True,
-        )[:8],
+        "hero_banners": hero_banners,
+        "promo_banners": promo_banners,
+        "featured_products": featured_products,
+        "new_products": new_products,
+        "best_rated": best_rated,
+        "deals": deals,
+        "stores": stores,
     }
     return render(request, "homepage/index.html", context)
 
@@ -94,7 +149,7 @@ def home_data(request):
             for block in HomepageTextBlock.objects.filter(is_active=True)
         ],
     }
-    return JsonResponse(payload)
+    return ok(payload)
 
 
 def site_data(request):
@@ -154,7 +209,7 @@ def site_data(request):
             for link in HomepageLink.objects.filter(is_active=True)
         ],
     }
-    return JsonResponse(payload)
+    return ok(payload)
 
 
 def search_data(request):
@@ -254,7 +309,7 @@ def search_data(request):
                 ],
             }
         )
-    return JsonResponse(
+    return ok(
         {
             "query": query,
             "count": len(results),
@@ -286,3 +341,43 @@ def _decimal_filter(value):
         return Decimal(value)
     except (InvalidOperation, TypeError, ValueError):
         return None
+
+
+def materiais_construcao(request):
+    """Página de Materiais de Construção (Template Index 5)"""
+    return render(request, "homepage/materiais_construcao.html")
+
+
+def mobilias(request):
+    """Página de Mobílias de Casas (Template Index 6)"""
+    return render(request, "homepage/mobilias.html")
+
+
+def criancas(request):
+    """Página de Materiais para Criança (Template Index 7)"""
+    return render(request, "homepage/criancas.html")
+
+
+def plantas_vasos(request):
+    """Página de Plantas e Vasos (Template Index 10)"""
+    return render(request, "homepage/plantas_vasos.html")
+
+
+def about(request):
+    """Página Sobre Nós"""
+    return render(request, "homepage/about.html")
+
+
+def contact(request):
+    """Página de Contacto & Apoio"""
+    return render(request, "homepage/contact.html")
+
+
+def careers(request):
+    """Página de Carreiras"""
+    return render(request, "homepage/careers.html")
+
+
+def terms(request):
+    """Página de Termos e Condições"""
+    return render(request, "homepage/terms.html")

@@ -78,7 +78,8 @@ class CheckoutTests(TestCase):
     def test_checkout_creates_parent_and_one_store_order_per_store(self):
         response = self.client.post(reverse("orders:checkout"), self.checkout_data())
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(response.json()["ok"])
         order = Order.objects.get()
         self.assertEqual(order.subtotal, Decimal("27500.00"))
         self.assertEqual(order.total, Decimal("27500.00"))
@@ -104,7 +105,8 @@ class CheckoutTests(TestCase):
 
         response = self.client.post(reverse("orders:checkout"), self.checkout_data())
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(response.json()["ok"])
         order = Order.objects.get()
         self.assertEqual(order.subtotal, Decimal("25500.00"))
         item = OrderItem.objects.get(product=self.products[0])
@@ -123,7 +125,8 @@ class CheckoutTests(TestCase):
 
         response = self.client.post(reverse("orders:checkout"), self.checkout_data())
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(response.json()["ok"])
         order = Order.objects.get()
         self.assertEqual(order.subtotal, Decimal("27500.00"))
 
@@ -132,8 +135,8 @@ class CheckoutTests(TestCase):
 
         response = self.client.post(reverse("orders:checkout"), self.checkout_data())
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 409)
+        self.assertFalse(response.json()["ok"])
         self.assertEqual(Order.objects.count(), 0)
-        self.assertTrue(response.context["form"].non_field_errors())
         self.products[0].refresh_from_db()
         self.assertEqual(self.products[0].stock, 5)

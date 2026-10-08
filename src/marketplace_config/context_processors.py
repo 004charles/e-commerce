@@ -36,3 +36,38 @@ def admin_metrics(request):
             "recent_orders": Order.objects.select_related("user").order_by("-created_at")[:5],
         }
     }
+
+
+def global_context(request):
+    """Contexto global para todos os templates do frontend."""
+    if request.path.startswith("/admin/"):
+        return {}
+
+    from catalog.models import Category
+    from homepage.models import SiteSettings, HomepageLink
+    from cart.services import get_cart_with_items
+
+    settings = SiteSettings.objects.filter(key="default").first()
+    categories = Category.objects.filter(is_active=True).order_by("sort_order", "name")
+    
+    cart_items = []
+    cart_count = 0
+    cart_subtotal = 0
+    try:
+        cart = get_cart_with_items(request)
+        cart_items = list(cart.items.all())
+        cart_count = cart.total_quantity
+        cart_subtotal = cart.subtotal
+    except Exception:
+        pass
+
+    return {
+        "site_settings": settings,
+        "global_categories": categories,
+        "cart_items": cart_items,
+        "cart_count": cart_count,
+        "cart_subtotal": cart_subtotal,
+        "top_links": HomepageLink.objects.filter(is_active=True, placement=HomepageLink.Placement.TOP),
+        "header_links": HomepageLink.objects.filter(is_active=True, placement=HomepageLink.Placement.HEADER),
+        "footer_links": HomepageLink.objects.filter(is_active=True, placement=HomepageLink.Placement.FOOTER),
+    }

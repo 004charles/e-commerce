@@ -56,7 +56,8 @@ class VendorProductManagementTests(TestCase):
         self.client.force_login(self.owner)
         response = self.client.post(reverse("stores:product-create"), self.product_data())
 
-        self.assertRedirects(response, reverse("stores:dashboard"))
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(response.json()["ok"])
         product = Product.objects.get(store=self.store, sku="SKU-001")
         self.assertEqual(product.slug, "auriculares-bluetooth")
         self.assertEqual(product.stock, 10)
@@ -78,7 +79,7 @@ class VendorProductManagementTests(TestCase):
             404,
         )
         self.assertEqual(
-            self.client.get(reverse("stores:product-delete", kwargs={"pk": product.pk})).status_code,
+            self.client.post(reverse("stores:product-delete", kwargs={"pk": product.pk})).status_code,
             404,
         )
 
@@ -100,7 +101,8 @@ class VendorProductManagementTests(TestCase):
             {"stock": "0"},
         )
 
-        self.assertRedirects(response, reverse("stores:dashboard"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["stock"], 0)
         product.refresh_from_db()
         self.assertEqual(product.stock, 0)
         self.assertEqual(product.status, Product.Status.OUT_OF_STOCK)
@@ -188,8 +190,8 @@ class ProductReviewTests(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.json()["success"])
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(response.json()["ok"])
         self.product.refresh_from_db()
         self.assertEqual(self.product.review_count, 1)
         self.assertEqual(str(self.product.rating), "5.00")
@@ -223,7 +225,8 @@ class ProductReviewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '"review_count": 1')
+        self.assertEqual(response.json()["reviews"]["count"], 1)
+        self.assertEqual(response.json()["reviews"]["rating"], 4.0)
 
 
 class ProductSEOTests(TestCase):
@@ -263,9 +266,8 @@ class ProductSEOTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "<link rel=\"canonical\"", html=False)
-        self.assertContains(response, self.product.get_absolute_url())
-        self.assertContains(response, "og:type")
-        self.assertContains(response, "https://schema.org")
-        self.assertContains(response, "Laptop Angola Pro")
-        self.assertContains(response, "AOA")
+        seo = response.json()["seo"]
+        self.assertIn(self.product.get_absolute_url(), seo["canonical_url"])
+        self.assertEqual(seo["structured_data"]["@context"], "https://schema.org")
+        self.assertEqual(seo["structured_data"]["name"], "Laptop Angola Pro")
+        self.assertEqual(seo["structured_data"]["offers"]["priceCurrency"], "AOA")

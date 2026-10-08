@@ -118,15 +118,15 @@ class AccountOrderTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    def test_logout_link_accepts_get_and_ends_session(self):
+    def test_logout_ends_session(self):
         self.client.force_login(self.customer)
 
-        response = self.client.get(reverse("accounts:logout"))
+        response = self.client.post(reverse("accounts:logout"))
 
-        self.assertRedirects(response, "/")
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["ok"])
         session_response = self.client.get(reverse("accounts:profile"))
-        self.assertEqual(session_response.status_code, 302)
-        self.assertIn("/account/login/?next=/account/profile/", session_response.url)
+        self.assertEqual(session_response.status_code, 401)
 
 
 class AdminDashboardTests(TestCase):

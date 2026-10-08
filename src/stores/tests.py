@@ -18,8 +18,8 @@ class StoreApplicationFlowTests(TestCase):
 
     def test_application_requires_authentication(self):
         response = self.client.get(reverse("stores:apply"))
-        self.assertEqual(response.status_code, 302)
-        self.assertIn(reverse("accounts:login"), response.url)
+        self.assertEqual(response.status_code, 401)
+        self.assertFalse(response.json()["ok"])
 
     def test_authenticated_user_can_submit_application(self):
         self.client.force_login(self.user)
@@ -34,7 +34,8 @@ class StoreApplicationFlowTests(TestCase):
                 "municipality": "Talatona",
             },
         )
-        self.assertRedirects(response, reverse("stores:application-success"))
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(response.json()["ok"])
         application = StoreApplication.objects.get()
         self.assertEqual(application.applicant, self.user)
         self.assertEqual(application.status, StoreApplication.Status.PENDING)
@@ -90,9 +91,11 @@ class StoreDashboardTests(TestCase):
         self.client.force_login(self.owner)
         response = self.client.get(reverse("stores:dashboard"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Loja do Proprietário")
-        self.assertContains(response, "Produto do proprietário")
-        self.assertNotContains(response, "Produto de outra loja")
+        payload = response.json()
+        self.assertEqual(payload["store"]["name"], "Loja do Proprietário")
+        names = [product["name"] for product in payload["products"]]
+        self.assertIn("Produto do proprietário", names)
+        self.assertNotIn("Produto de outra loja", names)
 
 
 class VendorOrderManagementTests(TestCase):
@@ -202,7 +205,8 @@ class VendorOrderManagementTests(TestCase):
             {"status": Order.Status.PROCESSING},
         )
 
-        self.assertRedirects(response, reverse("stores:dashboard"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["status"], Order.Status.PROCESSING)
         self.store_order.refresh_from_db()
         self.assertEqual(self.store_order.status, Order.Status.PROCESSING)
 
@@ -226,6 +230,7 @@ class VendorOrderManagementTests(TestCase):
             {"status": Order.Status.PROCESSING},
         )
 
-        self.assertRedirects(response, reverse("stores:dashboard"))
+        self.assertEqual(response.status_code, 409)
+        self.assertFalse(response.json()["ok"])
         self.store_order.refresh_from_db()
         self.assertEqual(self.store_order.status, Order.Status.SHIPPED)

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contacto & Apoio ao Cliente - {{ site_settings.site_name|default:"Marketplace Angola" }}{% endblock %}
+
+{% block content %}
+<div class="section-box">
+  <div class="breadcrumbs-div mb-0">
+    <div class="container">
+      <ul class="breadcrumb">
+        <li><a class="font-xs color-gray-1000" href="{% url 'homepage:home' %}">Início</a></li>
+        <li><a class="font-xs color-gray-500" href="javascript:void(0)">Institucional</a></li>
+        <li><a class="font-xs color-gray-500" href="{% url 'homepage:contact' %}">Contacto</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<section class="section-box shop-template mt-0">
+  <div class="container">
+    <div class="box-contact">
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="contact-form">
+            <h3 class="color-brand-3 mt-60">Fale Connosco</h3>
+            <p class="font-sm color-gray-700 mb-30">A nossa equipa de apoio ao cliente está pronta para ajudar com qualquer dúvida, pedido ou parceria.</p>
+            <form action="javascript:void(0)" method="post">
+              <div class="row">
+                <div class="col-lg-6 col-md-6">
+                  <div class="form-group">
+                    <input class="form-control" type="text" placeholder="Primeiro Nome" required>
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                  <div class="form-group">
+                    <input class="form-control" type="text" placeholder="Sobrenome" required>
+                  </div>
+                </div>
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <input class="form-control" type="email" placeholder="Endereço de E-mail" required>
+                  </div>
+                </div>
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <input class="form-control" type="tel" placeholder="Número de Telefone (+244)">
+                  </div>
+                </div>
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <textarea class="form-control" placeholder="Escreva a sua mensagem ou dúvida..." rows="5" required></textarea>
+                  </div>
+                </div>
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <button class="btn btn-buy w-auto" type="submit">Enviar Mensagem</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="box-contact-support pt-60 pb-30 pl-30 pr-30 background-gray-50 rounded mt-50">
+            <h4 class="mb-20 text-brand">Canais de Atendimento</h4>
+            <div class="mb-25">
+              <h5 class="mb-5"><i class="fi-rr-phone-call mr-5 text-brand"></i> Linha de Apoio:</h5>
+              <p class="font-md color-gray-900">{{ site_settings.support_phone|default:"+244 923 000 000" }}</p>
+              <span class="font-xs text-muted">Segunda a Sábado: 8h00 - 18h00</span>
+            </div>
+            <div class="mb-25">
+              <h5 class="mb-5"><i class="fi-rr-envelope mr-5 text-brand"></i> E-mail de Suporte:</h5>
+              <p class="font-md color-gray-900">{{ site_settings.support_email|default:"suporte@marketplace.co.ao" }}</p>
+            </div>
+            <div class="mb-25">
+              <h5 class="mb-5"><i class="fi-rr-marker mr-5 text-brand"></i> Escritório &amp; Atendimento Central:</h5>
+              <p class="font-md color-gray-900">{{ site_settings.contact_address|default:"Talatona, Luanda, Angola" }}</p>
+            </div>
+            <div class="mt-30">
+              <a href="/stores/apply/" class="btn btn-cart w-100 text-center">Quer vender no Marketplace? Abra a sua Loja</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,5 +1,5 @@
+from django.shortcuts import redirect, render
 from django.http import JsonResponse
-from django.shortcuts import redirect
 from django.views.decorators.http import require_GET, require_POST
 
 from .services import (
@@ -15,8 +15,11 @@ def _error(message, status=400):
     return JsonResponse({"ok": False, "error": message}, status=status)
 
 
-def legacy_cart_page(request):
-    return redirect("/?open_cart=1")
+@require_GET
+def cart_view(request):
+    """GET /cart/ — Página do Carrinho de Compras"""
+    payload = cart_payload(request)
+    return render(request, "cart/cart.html", {"cart": payload})
 
 
 @require_GET

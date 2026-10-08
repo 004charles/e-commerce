@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load catalog_tags %}
+
+{% block title %}{{ store.name }} - Loja Oficial | {{ site_settings.site_name|default:"Marketplace Angola" }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<div class="section-box">
+  <div class="breadcrumbs-div">
+    <div class="container">
+      <ul class="breadcrumb">
+        <li><a class="font-xs color-gray-1000" href="{% url 'homepage:home' %}">Início</a></li>
+        <li><a class="font-xs color-gray-500" href="{% url 'stores:list' %}">Lojas Parceiras</a></li>
+        <li><span class="font-xs color-gray-500">{{ store.name }}</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Perfil do Vendedor / Loja -->
+<section class="section-box shop-template mt-30">
+  <div class="container">
+    <!-- Banner e Informações da Loja -->
+    <div class="d-flex box-banner-vendor">
+      <div class="vendor-left">
+        <div class="banner-vendor">
+          <img src="{% static 'assets/imgs/page/vendor/featured.png' %}" alt="{{ store.name }}">
+          <div class="d-flex box-info-vendor">
+            <div class="avarta">
+              {% if store.logo %}
+                <img class="mb-5" src="{{ store.logo.url }}" alt="{{ store.name }}" style="max-height: 48px; max-width: 110px; width: auto; object-fit: contain;">
+              {% else %}
+                <img class="mb-5" src="{% static 'assets/imgs/page/vendor/fasfox.png' %}" alt="{{ store.name }}" style="max-height: 48px; max-width: 110px; width: auto; object-fit: contain;">
+              {% endif %}
+              <a class="btn btn-buy font-xs" href="javascript:void(0)">{{ total_products_count }} Produtos</a>
+            </div>
+            <div class="info-vendor">
+              <h4 class="mb-5">{{ store.name }}</h4>
+              <span class="font-xs color-gray-500 mr-20">Membro desde {{ store.created_at|date:"Y" }}</span>
+              <div class="rating d-inline-block">
+                <img src="{% static 'assets/imgs/template/icons/star.svg' %}" alt="star">
+                <img src="{% static 'assets/imgs/template/icons/star.svg' %}" alt="star">
+                <img src="{% static 'assets/imgs/template/icons/star.svg' %}" alt="star">
+                <img src="{% static 'assets/imgs/template/icons/star.svg' %}" alt="star">
+                <img src="{% static 'assets/imgs/template/icons/star.svg' %}" alt="star">
+                <span class="font-xs color-gray-500"> (4.9)</span>
+              </div>
+            </div>
+            <div class="vendor-contact">
+              <div class="row">
+                <div class="col-xl-7 col-lg-12">
+                  <div class="d-inline-block font-md color-gray-500 location mb-10">
+                    {% if store.municipality %}{{ store.municipality }}, {% endif %}{{ store.province|default:"Luanda" }} Angola
+                  </div>
+                </div>
+                <div class="col-xl-5 col-lg-12">
+                  <div class="d-inline-block font-md color-gray-500 phone">
+                    {% if store.phone %}{{ store.phone }}{% else %}(+244) 923 000 000{% endif %}
+                    {% if store.whatsapp %}<br>WhatsApp: {{ store.whatsapp }}{% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Diferenciais do Vendedor -->
+      <div class="vendor-right">
+        <div class="box-featured-product">
+          <div class="item-featured">
+            <div class="featured-icon"><img src="{% static 'assets/imgs/page/product/delivery.svg' %}" alt="Entrega"></div>
+            <div class="featured-info"><span class="font-sm-bold color-gray-1000">Entrega Rápida</span>
+              <p class="font-sm color-gray-500 font-medium">Envios em Luanda e Províncias</p>
+            </div>
+          </div>
+          <div class="item-featured">
+            <div class="featured-icon"><img src="{% static 'assets/imgs/page/product/support.svg' %}" alt="Suporte"></div>
+            <div class="featured-info"><span class="font-sm-bold color-gray-1000">Apoio 24/7</span>
+              <p class="font-sm color-gray-500 font-medium">Atendimento direto da loja</p>
+            </div>
+          </div>
+          <div class="item-featured">
+            <div class="featured-icon"><img src="{% static 'assets/imgs/page/product/return.svg' %}" alt="Garantia"></div>
+            <div class="featured-info"><span class="font-sm-bold color-gray-1000">Garantia Comprovada</span>
+              <p class="font-sm color-gray-500 font-medium">Produtos 100% autênticos</p>
+            </div>
+          </div>
+          <div class="item-featured">
+            <div class="featured-icon"><img src="{% static 'assets/imgs/page/product/payment.svg' %}" alt="Pagamento"></div>
+            <div class="featured-info"><span class="font-sm-bold color-gray-1000">Pagamento Seguro</span>
+              <p class="font-sm color-gray-500 font-medium">Multicaixa Express &amp; Garantia</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-bottom mb-20 border-vendor"></div>
+
+    <!-- Barra de Filtros e Categorias da Loja -->
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="box-filters mt-0 pb-5 border-bottom">
+          <div class="row align-items-center">
+            <!-- Categorias Disponíveis nesta Loja -->
+            <div class="col-xl-6 col-lg-5 mb-10 text-lg-start text-center">
+              <div class="d-inline-flex flex-wrap align-items-center">
+                <span class="font-sm color-gray-500 font-medium mr-10">Categorias:</span>
+                <a href="{% url 'stores:detail' slug=store.slug %}" class="btn btn-sm {% if not current_category %}btn-buy{% else %}btn-gray{% endif %} font-xs mr-5 mb-5" style="border-radius: 4px; padding: 5px 14px;">
+                  Todas ({{ total_products_count }})
+                </a>
+                {% for cat in store_categories %}
+                <a href="{% url 'stores:detail' slug=store.slug %}?category={{ cat.slug }}" class="btn btn-sm {% if current_category == cat.slug %}btn-buy{% else %}btn-gray{% endif %} font-xs mr-5 mb-5" style="border-radius: 4px; padding: 5px 14px;">
+                  {{ cat.name }} ({{ cat.prod_count }})
+                </a>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Ordenação e Contagem -->
+            <div class="col-xl-6 col-lg-7 mb-10 text-lg-end text-center">
+              <span class="font-sm color-gray-900 font-medium border-1-right span mr-15">A mostrar {{ products|length }} de {{ total_count }} produtos</span>
+              <div class="d-inline-block">
+                <span class="font-sm color-gray-500 font-medium">Ordenar por:</span>
+                <div class="dropdown dropdown-sort border-1-right">
+                  <button class="btn dropdown-toggle font-sm color-gray-900 font-medium" id="dropdownSort" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    {% if current_sort == 'newest' %}Mais Recentes
+                    {% elif current_sort == 'price_asc' %}Menor Preço
+                    {% elif current_sort == 'price_desc' %}Maior Preço
+                    {% elif current_sort == 'rating' %}Melhor Avaliação
+                    {% else %}Em Destaque{% endif %}
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-light dropdown-menu-end" aria-labelledby="dropdownSort">
+                    <li><a class="dropdown-item {% if current_sort == 'featured' or not current_sort %}active{% endif %}" href="?{% if current_category %}category={{ current_category }}&{% endif %}sort=featured">Em Destaque</a></li>
+                    <li><a class="dropdown-item {% if current_sort == 'newest' %}active{% endif %}" href="?{% if current_category %}category={{ current_category }}&{% endif %}sort=newest">Mais Recentes</a></li>
+                    <li><a class="dropdown-item {% if current_sort == 'price_asc' %}active{% endif %}" href="?{% if current_category %}category={{ current_category }}&{% endif %}sort=price_asc">Menor Preço</a></li>
+                    <li><a class="dropdown-item {% if current_sort == 'price_desc' %}active{% endif %}" href="?{% if current_category %}category={{ current_category }}&{% endif %}sort=price_desc">Maior Preço</a></li>
+                    <li><a class="dropdown-item {% if current_sort == 'rating' %}active{% endif %}" href="?{% if current_category %}category={{ current_category }}&{% endif %}sort=rating">Melhor Avaliação</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grelha de Produtos da Loja (5 Colunas conforme template original) -->
+        {% if products %}
+        <div class="list-products-5 mt-20">
+          {% for product in products %}
+          <div class="card-grid-style-3">
+            <div class="card-grid-inner">
+              <div class="tools">
+                <a class="btn btn-trend btn-tooltip mb-10" href="javascript:void(0)" aria-label="Destaque"></a>
+                <a class="btn btn-wishlist btn-tooltip mb-10" href="javascript:void(0)" aria-label="Favoritos"></a>
+                <a class="btn btn-compare btn-tooltip mb-10" href="javascript:void(0)" aria-label="Comparar"></a>
+              </div>
+              <div class="image-box">
+                {% if product.compare_at_price and product.compare_at_price > product.price %}
+                  <span class="label bg-brand-2">-{{ product|get_discount_percent }}%</span>
+                {% elif product.is_new %}
+                  <span class="label bg-success">Novo</span>
+                {% endif %}
+                <a href="{{ product.get_absolute_url }}">
+                  {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-height: 140px; width: auto; object-fit: contain; margin: 0 auto; display: block;">
+                  {% else %}
+                    <img src="{% static 'assets/imgs/page/homepage1/imgsp3.png' %}" alt="{{ product.name }}" style="max-height: 140px; width: auto; object-fit: contain; margin: 0 auto; display: block;">
+                  {% endif %}
+                </a>
+              </div>
+              <div class="info-right">
+                <a class="font-xs color-gray-500" href="{% url 'stores:detail' slug=store.slug %}">{{ store.name }}</a><br>
+                <a class="color-brand-3 font-sm-bold text-truncate-2" href="{{ product.get_absolute_url }}" title="{{ product.name }}">{{ product.name }}</a>
+                <div class="rating">
+                  <img src="{% static 'assets/imgs/template/icons/star.svg' %}" alt="star">
+                  <img src="{% static 'assets/imgs/template/icons/star.svg' %}" alt="star">
+                  <img src="{% static 'assets/imgs/template/icons/star.svg' %}" alt="star">
+                  <img src="{% static 'assets/imgs/template/icons/star.svg' %}" alt="star">
+                  <img src="{% static 'assets/imgs/template/icons/star.svg' %}" alt="star">
+                  <span class="font-xs color-gray-500">({{ product.review_count|default:"5" }})</span>
+                </div>
+                <div class="price-info">
+                  <strong class="font-lg-bold color-brand-3 price-main">{{ product|get_effective_price|currency }}</strong>
+                  {% if product.compare_at_price and product.compare_at_price > product.price %}
+                    <span class="color-gray-500 price-line">{{ product|get_original_price|currency }}</span>
+                  {% endif %}
+                </div>
+                <div class="mt-20 box-btn-cart">
+                  <form method="post" action="/cart/add/{{ product.id }}/" style="display: block; width: 100%;">
+                    {% csrf_token %}
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn btn-cart" style="border: none; cursor: pointer; width: 100%;">Adicionar</button>
+                  </form>
+                </div>
+                {% if product.short_description %}
+                <ul class="list-features">
+                  <li>{{ product.short_description|truncatechars:45 }}</li>
+                </ul>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Paginação -->
+        {% if num_pages > 1 %}
+        <nav class="mt-30">
+          <ul class="pagination justify-content-center">
+            {% if page > 1 %}
+            <li class="page-item">
+              <a class="page-link" href="?{% if current_category %}category={{ current_category }}&{% endif %}{% if current_sort %}sort={{ current_sort }}&{% endif %}page={{ page|add:'-1' }}">&laquo; Anterior</a>
+            </li>
+            {% endif %}
+            <li class="page-item active">
+              <span class="page-link">{{ page }} / {{ num_pages }}</span>
+            </li>
+            {% if page < num_pages %}
+            <li class="page-item">
+              <a class="page-link" href="?{% if current_category %}category={{ current_category }}&{% endif %}{% if current_sort %}sort={{ current_sort }}&{% endif %}page={{ page|add:'1' }}">Próxima &raquo;</a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-50">
+          <img src="{% static 'assets/imgs/template/icons/trend.svg' %}" style="width: 60px; opacity: 0.4;" class="mb-20" alt="Nenhum produto">
+          <h4 class="color-gray-900 mb-10">Nenhum produto encontrado nesta categoria</h4>
+          <p class="font-md color-gray-500 mb-20">Esta loja ainda não adicionou produtos para o filtro selecionado.</p>
+          <a href="{% url 'stores:detail' slug=store.slug %}" class="btn btn-brand-2">Ver Todos os Produtos da Loja</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
